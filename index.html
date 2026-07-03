@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mcp-chaos — find out what your AI agent does when its tools fail</title>
+<meta name="description" content="A fault-injecting MCP proxy. Change one line of MCP config, break your agent's tools on purpose, and get a report of how it behaved — before production does it for you.">
+<meta property="og:title" content="mcp-chaos — chaos engineering for AI agents">
+<meta property="og:description" content="One injected timeout cost a real agent 4 blind retries, 12 turns and $1.01. Find out what yours does — one line of MCP config, no code.">
+<meta property="og:image" content="https://smartai.github.io/mcp-chaos/assets/report-screenshot.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='6' fill='%23ef4444'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #fafaf9;
+    --ink: #16181d;
+    --muted: #6b7280;
+    --line: #e7e5e4;
+    --call: #3b82f6;    /* tool_call */
+    --fault: #ef4444;   /* fault — the accent */
+    --result: #10b981;  /* tool_result */
+    --listing: #8b5cf6; /* tools_list */
+    --amber: #f59e0b;   /* response */
+    --rail: 2.2rem;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font: 400 17px/1.65 "Source Serif 4", Georgia, serif;
+  }
+  a { color: inherit; text-decoration-color: var(--fault); text-underline-offset: 3px; }
+  a:hover { color: var(--fault); }
+  a:focus-visible, .btn:focus-visible { outline: 2px solid var(--fault); outline-offset: 3px; border-radius: 2px; }
+  code, pre, .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+  code { font-size: .85em; background: #f0efed; padding: 1px 5px; border-radius: 4px; }
+
+  header.top {
+    display: flex; justify-content: space-between; align-items: baseline;
+    max-width: 920px; margin: 0 auto; padding: 1.4rem 1.5rem 0;
+  }
+  .wordmark { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 1.05rem; letter-spacing: -.01em; text-decoration: none; }
+  .wordmark .dot { color: var(--fault); }
+  .top a.gh { font-family: "IBM Plex Mono", monospace; font-size: .8rem; color: var(--muted); text-decoration: none; }
+  .top a.gh:hover { color: var(--fault); }
+
+  /* The session: every section is an event on the run's timeline */
+  main { max-width: 920px; margin: 0 auto; padding: 0 1.5rem 4rem; }
+  .session { position: relative; }
+  .session::before {
+    content: ""; position: absolute; top: 1.2rem; bottom: 0; left: 5px;
+    width: 2px; background: var(--line);
+  }
+  section.event { position: relative; padding: 3.2rem 0 1rem var(--rail); }
+  .evline { font-family: "IBM Plex Mono", monospace; font-size: .78rem; color: var(--muted); letter-spacing: .01em; }
+  .evline::before {
+    content: ""; position: absolute; left: 0; margin-top: .30em;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--dot, var(--muted)); border: 2px solid var(--paper);
+  }
+  .evline b { color: var(--ink); font-weight: 500; }
+  h1, h2 { font-family: "Space Grotesk", sans-serif; letter-spacing: -.02em; }
+  h2 { font-size: 1.7rem; line-height: 1.2; margin: .45rem 0 .9rem; }
+
+  /* hero */
+  .hero h1 { font-size: clamp(2.3rem, 6vw, 3.6rem); line-height: 1.04; margin: .5rem 0 1.1rem; }
+  .hero h1 em { font-style: normal; color: var(--fault); }
+  .lede { font-size: 1.18rem; max-width: 42em; }
+  .btnrow { margin: 1.6rem 0 2rem; display: flex; gap: .8rem; flex-wrap: wrap; }
+  .btn {
+    font-family: "Space Grotesk", sans-serif; font-weight: 500; font-size: .95rem;
+    text-decoration: none; padding: .6rem 1.15rem; border-radius: 8px;
+  }
+  .btn.primary { background: var(--ink); color: var(--paper); }
+  .btn.primary:hover { background: var(--fault); color: #fff; }
+  .btn.quiet { border: 1.5px solid var(--line); color: var(--ink); }
+  .btn.quiet:hover { border-color: var(--fault); color: var(--fault); }
+
+  figure { margin: 1.4rem 0 0; }
+  figure img { width: 100%; border: 1px solid var(--line); border-radius: 10px; display: block; }
+  figcaption { font-size: .85rem; font-style: italic; color: var(--muted); margin-top: .6rem; }
+
+  table { border-collapse: collapse; width: 100%; font-size: .92rem; margin: 1rem 0; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  th { font-family: "IBM Plex Mono", monospace; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 500; }
+  td:first-child { font-weight: 600; }
+  .num { font-family: "IBM Plex Mono", monospace; font-size: .85rem; }
+  .bad { color: var(--fault); font-weight: 600; }
+  .good { color: var(--result); font-weight: 600; }
+
+  pre.term {
+    background: var(--ink); color: #e7e5e4; border-radius: 10px;
+    padding: 1.1rem 1.3rem; overflow-x: auto; font-size: .84rem; line-height: 1.6;
+  }
+  pre.term .c { color: #8a8f98; } /* comment */
+  pre.term .k { color: #fca5a5; } /* fault keys */
+  pre.diagram { font-size: .8rem; line-height: 1.45; color: var(--ink); background: #f0efed; border-radius: 10px; padding: 1.1rem 1.3rem; overflow-x: auto; }
+
+  ul.value { padding-left: 1.1rem; }
+  ul.value li { margin: .5rem 0; }
+  ul.value b { font-family: "Space Grotesk", sans-serif; font-weight: 500; }
+
+  .scope { border-left: 3px solid var(--amber); padding: .2rem 0 .2rem 1rem; color: #44403c; font-style: italic; }
+
+  footer {
+    border-top: 1px solid var(--line); margin-top: 2rem;
+    font-family: "IBM Plex Mono", monospace; font-size: .75rem; color: var(--muted);
+  }
+  footer .in { max-width: 920px; margin: 0 auto; padding: 1.2rem 1.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  footer a { text-decoration: none; }
+
+  @media (max-width: 640px) {
+    :root { --rail: 1.6rem; }
+    body { font-size: 16px; }
+    th, td { padding: 6px 6px; }
+    .evline { font-size: .68rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a class="wordmark" href="#">mcp-chaos<span class="dot">●</span></a>
+  <a class="gh" href="https://github.com/SmartAI/mcp-chaos">github.com/SmartAI/mcp-chaos →</a>
+</header>
+
+<main>
+<div class="session">
+
+  <section class="event hero" style="--dot: var(--muted)">
+    <p class="evline"><b>t=0.000s</b> · session_start · command=<b>uvx mcp-chaos run</b></p>
+    <h1>Your agent works.<br>Until a tool <em>fails</em>.</h1>
+    <p class="lede">mcp-chaos is a transparent MCP proxy that breaks your agent's tools on
+    purpose — timeouts, rate limits, poisoned results — and records exactly how the agent
+    behaves. One line of MCP config. No SDK, no code, any MCP client.</p>
+    <div class="btnrow">
+      <a class="btn primary" href="https://github.com/SmartAI/mcp-chaos">Get it on GitHub</a>
+      <a class="btn quiet" href="https://github.com/SmartAI/mcp-chaos/blob/main/docs/usage.md">Read the usage guide</a>
+    </div>
+    <figure>
+      <img src="assets/demo.gif" alt="Replay of a recorded run: one injected write_file timeout costs Claude Code 4 blind retries, 12 turns, 89 seconds and $1.01" width="1200">
+      <figcaption>A real recorded run: one injected <code>write_file</code> timeout vs. headless
+      Claude Code — 4 blind retries, 12 turns, 89&nbsp;s, $1.01 burned.
+      <a href="https://github.com/SmartAI/mcp-chaos/blob/main/docs/experiments/2026-07-03-claude-code-timeout.md">Full experiment →</a></figcaption>
+    </figure>
+  </section>
+
+  <section class="event" style="--dot: var(--fault)">
+    <p class="evline"><b>t=8.306s</b> · <b>fault</b> · tool=write_file · type=timeout</p>
+    <h2>The test nothing else in your stack runs</h2>
+    <p>Production tools time out, rate-limit, return empty or poisoned data — and most
+    production agent incidents come from these tool-call failures, not from the model
+    being wrong. When it happens, does your agent retry sanely, loop and burn money,
+    re-run a payment it already made, or tell you "done" when nothing happened?
+    Right now you find out in production.</p>
+    <table>
+      <thead><tr><th>Layer</th><th>The question it answers</th><th>When you learn</th></tr></thead>
+      <tbody>
+        <tr><td>Evals</td><td>Does the agent do the task right on <i>good</i> inputs?</td><td class="num">pre-ship</td></tr>
+        <tr><td>Observability</td><td>What <i>did</i> the agent do?</td><td class="num">after it broke</td></tr>
+        <tr><td>mcp-chaos</td><td>How does the agent behave <i>while its tools are failing</i>?</td><td class="num good">pre-ship</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="event" style="--dot: var(--call)">
+    <p class="evline"><b>t=9.1s … t=97.4s</b> · tool_call · write_file · <b>×4 retries, same dead tool</b></p>
+    <h2>One timeout, six models — a 50× cost spread</h2>
+    <p>Same injected <code>write_file</code> timeout, same task, six models. The more
+    capable the model, the <i>more</i> it spent fighting a tool that was never going
+    to work:</p>
+    <table>
+      <thead><tr><th>Model</th><th>Agent</th><th>Retries</th><th>Verdict</th><th>Time</th><th>Cost</th><th>Outcome</th></tr></thead>
+      <tbody>
+        <tr><td>Haiku 4.5</td><td>Claude Code</td><td class="num">2</td><td>retried</td><td class="num">18 s</td><td class="num">$0.04</td><td>failed (honest)</td></tr>
+        <tr><td>Sonnet</td><td>Claude Code</td><td class="num">2</td><td>retried</td><td class="num">13 s</td><td class="num">$0.11</td><td>failed (honest)</td></tr>
+        <tr><td>Opus</td><td>Claude Code</td><td class="num">4</td><td class="bad">runaway</td><td class="num">58 s</td><td class="num">$0.60</td><td>failed (honest)</td></tr>
+        <tr><td>Fable 5</td><td>Claude Code</td><td class="num">3</td><td class="bad">runaway</td><td class="num">172 s</td><td class="num">$2.28</td><td class="good">succeeded via workaround</td></tr>
+        <tr><td>gpt-5.5</td><td>Codex</td><td class="num">1*</td><td>—</td><td class="num">8 s</td><td class="num">—</td><td>failed (honest)</td></tr>
+        <tr><td>gpt-5.4-mini</td><td>Codex</td><td class="num">2*</td><td>—</td><td class="num">15 s</td><td class="num">—</td><td>failed (honest)</td></tr>
+      </tbody>
+    </table>
+    <p><small>N=1 per model — a seed, not a robust benchmark; the OpenAI rows are preliminary.
+    <a href="https://github.com/SmartAI/mcp-chaos/blob/main/docs/experiments/2026-07-03-cross-agent-timeout.md">Read the fine print →</a></small></p>
+  </section>
+
+  <section class="event" style="--dot: var(--amber)">
+    <p class="evline"><b>proxy</b> · relays everything · tampers only with what you tell it to</p>
+    <h2>How it works</h2>
+<pre class="diagram">Agent (Claude Code / Cursor / yours)
+        │  MCP
+        ▼
+   ┌───────────┐    faults.yaml: timeout, 429, garbage JSON,
+   │ mcp-chaos │◄── empty results, slow drip, injected text
+   └───────────┘
+        │  MCP
+        ▼
+   Real MCP server (GitHub, filesystem, DB, ...)</pre>
+    <p>Seven fault types — <code>timeout</code>, <code>error</code>, <code>rate_limit</code>,
+    <code>slow</code>, <code>empty</code>, <code>corrupt</code>, <code>inject</code>
+    (indirect prompt injection) — matched by tool name, call count, or probability.
+    Every event lands in a JSONL log and renders as a single-file HTML report with a
+    deterministic resilience verdict: no LLM judging, rules you can audit.</p>
+    <ul class="value">
+      <li><b>What one dead tool costs you</b> — retries, wall-clock, dollars burned.</li>
+      <li><b>Whether your agent loops</b> — runaway-retry detection.</li>
+      <li><b>Whether it blindly re-runs writes</b> — the pattern that double-charges cards.</li>
+      <li><b>Whether it follows poisoned tool output</b> — injection resilience.</li>
+      <li><b>Your agent can run the whole test itself</b> — via the shipped
+        <a href="https://github.com/SmartAI/mcp-chaos/blob/main/skills/mcp-chaos/SKILL.md">agent skill</a>:
+        just ask it to "chaos-test my MCP setup".</li>
+    </ul>
+    <figure>
+      <img src="assets/report-screenshot.png" alt="The HTML report: injected write_file timeout, 4 blind retries, runaway verdict, full event timeline" width="1200" loading="lazy">
+      <figcaption>The report from the run above: the fault, the 4 blind retries, the
+      <span class="bad">runaway</span> verdict — with the full event timeline as evidence.</figcaption>
+    </figure>
+  </section>
+
+  <section class="event" style="--dot: var(--listing)">
+    <p class="evline"><b>t=0.706s</b> · tools_list · count=2 · <b>~1163 tokens of definitions</b></p>
+    <h2>Not just chaos: profile any MCP server</h2>
+    <p>With <code>faults: []</code> the proxy is a pure relay, and the report profiles how
+    your agent actually uses the server: the context-token cost of tool definitions, tools
+    you load but never call, per-tool latency and result sizes, and calls the agent had to
+    re-issue with corrected arguments — a confusing schema, made measurable.</p>
+    <figure>
+      <img src="assets/report-efficiency.png" alt="MCP efficiency report from a real zero-fault run against the Context7 MCP server" width="1200" loading="lazy">
+      <figcaption>A real zero-fault run through the Context7 docs server: even a 2-tool
+      server loads ~1.2k tokens of definitions into every session, and each call returns
+      another ~0.5–1k tokens.</figcaption>
+    </figure>
+  </section>
+
+  <section class="event" style="--dot: var(--result)">
+    <p class="evline"><b>t=now</b> · tool_result · ok=true · <b>your turn</b></p>
+    <h2>Quickstart</h2>
+<pre class="term"><span class="c"># 1. Describe the faults to inject</span>
+cat &gt; faults.yaml &lt;&lt;'EOF'
+server:
+  command: "npx -y @modelcontextprotocol/server-filesystem /tmp/demo"
+faults:
+  - tool: <span class="k">"write_file"</span>
+    type: <span class="k">timeout</span>
+EOF
+
+<span class="c"># 2. In your agent's MCP config, replace the real server with the proxy:</span>
+<span class="c">#    "command": "uvx",</span>
+<span class="c">#    "args": ["mcp-chaos", "run", "-c", "/abs/faults.yaml", "--record", "/abs/run.jsonl"]</span>
+
+<span class="c"># 3. Use your agent normally, then render the report</span>
+uvx mcp-chaos report run.jsonl -o report.html</pre>
+    <p>Works with every MCP client — Claude Code, Cursor, Claude Desktop, or anything you
+    built yourself — because it sits at the protocol layer, not inside your agent.
+    <code>--fail-on runaway</code> turns the verdict into a CI exit code.</p>
+    <p class="scope">Honest scope: the proxy sees MCP tool traffic, not the agent's chat
+    output, and speaks stdio servers today (Streamable HTTP is planned). It observes
+    retries, loops and give-up behavior directly; "the agent claimed success while the
+    tool failed" needs transcript correlation — on the roadmap, not in the box.</p>
+    <div class="btnrow">
+      <a class="btn primary" href="https://github.com/SmartAI/mcp-chaos">Star the repo →</a>
+      <a class="btn quiet" href="https://github.com/SmartAI/mcp-chaos/issues">Suggest a fault scenario</a>
+    </div>
+  </section>
+
+</div>
+</main>
+
+<footer>
+  <div class="in">
+    <span>mcp-chaos · MIT license</span>
+    <a href="https://github.com/SmartAI/mcp-chaos">source</a>
+    <a href="https://github.com/SmartAI/mcp-chaos/blob/main/docs/usage.md">docs</a>
+    <a href="https://github.com/SmartAI/mcp-chaos/tree/main/docs/experiments">experiments</a>
+    <a href="https://github.com/SmartAI/mcp-chaos/tree/main/examples">example scenarios</a>
+  </div>
+</footer>
+
+</body>
+</html>
