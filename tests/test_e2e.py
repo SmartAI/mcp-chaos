@@ -112,6 +112,39 @@ def test_inject_appends_payload():
     assert "PWNED_MARKER" in resp["result"]["content"][0]["text"]
 
 
+def test_efficiency_capture():
+    # With zero faults the proxy is a pure relay, but it must still capture the
+    # efficiency raw data: the tools/list payload and per-call results/latency.
+    proc = _proxy(f'server:\n  command: "{sys.executable} {MOCK}"\nfaults: []\n')
+    record = proc.args[proc.args.index("--record") + 1]
+    try:
+        _rpc(proc, "initialize", 1)
+        listing = _rpc(proc, "tools/list", 2)
+        assert len(listing["result"]["tools"]) == 2  # relay still transparent
+        _call(proc, 3, "get_order")
+    finally:
+        proc.stdin.close()
+        proc.terminate()
+        proc.wait(timeout=5)
+
+    with open(record) as f:
+        events = [json.loads(line) for line in f if line.strip()]
+    by_kind = {e["kind"]: e for e in events}
+
+    tl = by_kind["tools_list"]
+    assert tl["detail"]["tools"] == ["get_order", "merge_pull_request"]
+    assert tl["detail"]["chars"] > 0
+
+    tc = by_kind["tool_call"]
+    assert tc["detail"]["args_hash"]
+
+    tr = by_kind["tool_result"]
+    assert tr["tool"] == "get_order"
+    assert tr["detail"]["ok"] is True
+    assert tr["detail"]["ms"] >= 0
+    assert tr["detail"]["chars"] > 0
+
+
 def test_record_survives_sigterm():
     # Real MCP clients (e.g. Claude Code) SIGTERM the server at session end
     # rather than closing stdin; the run log must not be lost.

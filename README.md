@@ -44,6 +44,11 @@ and hands you a report with evidence:
   double-charges cards and double-merges PRs when a timeout wasn't real.
 - **How it handles poisoned results** — inject adversarial text into tool
   output and see if your agent follows it.
+- **Where your context leaks even when nothing fails** — run with zero faults
+  and the report profiles your MCP setup: the token cost of tool definitions,
+  tools you load but never use, per-tool latency and result sizes, and calls
+  the agent had to re-issue with corrected arguments (a confusing schema, made
+  measurable).
 - **Your agent can run the whole test itself** — we ship an
   [agent skill](#for-ai-agents), so you can just ask Claude Code (or any
   skill-capable agent) to "chaos-test my MCP setup".

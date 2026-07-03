@@ -204,6 +204,36 @@ mcp-chaos report run.jsonl -o report.html --fail-on runaway
 strictest gate — any retry at all (retried or runaway) fails. The tripped
 findings are printed to stderr and the HTML report is still written either way.
 
+## Profile your MCP setup (no faults required)
+
+Chaos is optional. With an empty rule list the proxy is a pure relay, and the
+report's **MCP efficiency** section profiles how your agent actually uses the
+server:
+
+```yaml
+server:
+  command: "npx -y @modelcontextprotocol/server-github"
+faults: []          # observe only, inject nothing
+```
+
+Run your agent normally, render the report, and you get — all measured
+deterministically from traffic, no LLM judging:
+
+- **Context tax** — how many tools the server advertises and the ~token cost of
+  those definitions, loaded into your context every single session.
+- **Dead weight** — tools advertised but never called: config you're paying
+  context for and not using.
+- **Per-tool profile** — calls, real errors (injected faults are excluded),
+  average latency, and the ~token size of results the agent has to read.
+- **Corrected retries** — calls that failed and were re-issued with *different*
+  arguments: the agent had to guess the schema twice. A high count means the
+  tool's description or schema is confusing your agent; that's a finding for
+  whoever owns the MCP server.
+
+Token figures use a chars/4 estimate — rough, but stable enough to rank where
+your context goes. This also works during a chaos run: the efficiency section
+appears in every report.
+
 ## Turning it off and removing it
 
 The proxy lives entirely in your agent's MCP config — it never modifies the real

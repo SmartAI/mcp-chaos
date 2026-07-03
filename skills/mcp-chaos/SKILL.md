@@ -143,6 +143,10 @@ When summarizing for the user, combine both data sources:
   claimed-success bug, the most serious finding. For `inject` faults, check
   whether the agent followed the injected instruction.
 - **Cost**: turns, seconds, and dollars burned by the fault.
+- **MCP efficiency** (in every report; run with `faults: []` for a pure
+  profiling session): context-token cost of the server's tool definitions,
+  advertised-but-never-called tools, per-tool latency and result sizes, and
+  calls re-issued with corrected arguments (schema/description friction).
 
 ### 6. Clean up
 
