@@ -1,5 +1,7 @@
 # mcp-chaos
 
+[![CI](https://github.com/SmartAI/mcp-chaos/actions/workflows/ci.yml/badge.svg)](https://github.com/SmartAI/mcp-chaos/actions/workflows/ci.yml)
+
 **Find out what your AI agent does when its tools fail — before production does.**
 
 ![One injected timeout costs a real agent 4 blind retries, 12 turns, 89 seconds, $1.01 — replay of a recorded Claude Code run](docs/demo.gif)
