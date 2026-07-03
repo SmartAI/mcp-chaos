@@ -146,8 +146,12 @@ client speaks.
 ## Step 3 — run your agent, read the report
 
 Use the agent normally — give it a task that exercises the faulted tools. Events
-are appended to the `--record` file as they happen, so the log survives even if
-the client kills the proxy mid-session.
+are appended to the `--record` file as they happen, and the file is never
+truncated — so the log survives both the client killing the proxy and clients
+(e.g. Codex CLI) that restart the MCP server mid-session. Each proxy launch
+writes a `session_start` marker event, so restarts are visible in the timeline.
+Because the file only grows, use a fresh `--record` path per scenario to keep
+runs separate.
 
 Then render the report:
 

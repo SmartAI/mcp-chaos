@@ -38,7 +38,7 @@ def _run(args) -> int:
     from .recorder import Recorder
 
     cfg = config.load(args.config)
-    recorder = Recorder(args.record)
+    recorder = Recorder(args.record, command=cfg.command, faults=len(cfg.faults))
     # Startup notice goes to stderr so it never corrupts the stdio JSON-RPC stream.
     print(f"mcp-chaos: proxying `{cfg.command}` with {len(cfg.faults)} fault(s)",
           file=sys.stderr)

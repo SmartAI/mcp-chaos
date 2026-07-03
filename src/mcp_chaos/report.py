@@ -8,7 +8,8 @@ import json
 from .checks import analyze, summary_line
 from .recorder import Event
 
-_COLORS = {"tool_call": "#3b82f6", "fault": "#ef4444", "response": "#f59e0b"}
+_COLORS = {"tool_call": "#3b82f6", "fault": "#ef4444", "response": "#f59e0b",
+           "session_start": "#6b7280"}
 _VERDICT_COLORS = {"runaway": "#ef4444", "retried": "#f59e0b", "stopped": "#6b7280"}
 
 
