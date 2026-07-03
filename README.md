@@ -44,6 +44,9 @@ and hands you a report with evidence:
   double-charges cards and double-merges PRs when a timeout wasn't real.
 - **How it handles poisoned results** — inject adversarial text into tool
   output and see if your agent follows it.
+- **Your agent can run the whole test itself** — we ship an
+  [agent skill](#for-ai-agents), so you can just ask Claude Code (or any
+  skill-capable agent) to "chaos-test my MCP setup".
 
 **Zero integration cost.** No SDK, no code, no framework lock-in. You change one
 line in your agent's MCP config — that's the whole setup. Works with every MCP
@@ -105,6 +108,11 @@ Agent (Claude Code / Cursor / yours)
 The proxy relays MCP traffic untouched, except tool calls that match your fault
 rules. Every event is recorded to a JSONL log and rendered as a single-file HTML
 report with a resilience verdict.
+
+![HTML report: 10 tool calls, 5 faults injected, 1 runaway loop — findings table and event timeline](docs/report-screenshot.png)
+
+*The report from the run above: the injected `write_file` timeout, the 4 blind
+retries, and the `runaway` verdict — with the full event timeline as evidence.*
 
 ## Quickstart
 
