@@ -177,6 +177,22 @@ Faults match by tool name (globs like `search_*` work), call count, and
 probability — so you can fail the third call only, or 10% of calls, or
 everything a tool ever does.
 
+## Not just chaos: profile any MCP server
+
+With `faults: []` the proxy is a pure relay, and the report profiles how your
+agent actually uses the server — measured from traffic, no LLM judging: the
+context-token cost of the tool definitions, tools you load but never call,
+per-tool latency and result sizes, and calls the agent had to re-issue with
+corrected arguments (a confusing schema, made measurable).
+
+![MCP efficiency report from a real zero-fault run against the Context7 MCP server](docs/report-efficiency.png)
+
+*A real zero-fault run: headless Claude Code (Haiku) answering one docs question
+through [Context7](https://github.com/upstash/context7). Even this 2-tool server
+loads ~1.2k tokens of tool definitions into every session, and each call returns
+another ~0.5–1k tokens — costs you'd otherwise never see itemized. Works on any
+stdio MCP server; see the [usage guide](docs/usage.md#profile-your-mcp-setup-no-faults-required).*
+
 ## Honest scope
 
 The proxy sees MCP tool traffic, not the agent's chat output. It directly
