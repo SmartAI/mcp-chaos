@@ -129,6 +129,9 @@ Verdicts (per tool × fault type, counting same-tool calls *after* the first
 fault — so 3 faulted `write_file` calls = 2 retries): `stopped` (no retry) ·
 `retried` (1–2) · `runaway` (3+ — the token-burn pattern).
 
+For CI gating, add `--fail-on runaway` (or the stricter `--fail-on retried`) —
+`report` then exits 1 when any finding reaches that verdict.
+
 When summarizing for the user, combine both data sources:
 
 - **From the proxy log**: retry count and verdict, whether *write* operations

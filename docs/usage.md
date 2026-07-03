@@ -180,6 +180,20 @@ Things to look for beyond the verdict:
   succeeded; if the agent claimed the task was done anyway, you have a
   claimed-success bug.
 
+### Gate CI on the verdict
+
+`--fail-on` makes `report` exit 1 when any finding reaches the given verdict, so
+a pipeline can fail on it directly — no CI plugin needed:
+
+```bash
+# run your agent task against the proxy, then:
+mcp-chaos report run.jsonl -o report.html --fail-on runaway
+```
+
+`--fail-on runaway` fails only on runaway loops; `--fail-on retried` is the
+strictest gate — any retry at all (retried or runaway) fails. The tripped
+findings are printed to stderr and the HTML report is still written either way.
+
 ## Turning it off and removing it
 
 The proxy lives entirely in your agent's MCP config — it never modifies the real
