@@ -1,0 +1,33 @@
+# Scenario: a degraded dependency that fails intermittently and runs slow.
+#
+# What it hunts:
+#   Real services rarely die cleanly — they get flaky. This mixes two rules on the
+#   same tool: a 30% chance of an outright error, and (when the error roll misses)
+#   an always-on latency penalty. It simulates a rate-limited or overloaded
+#   backend that sometimes 5xxs and is sluggish the rest of the time.
+#
+#   Rules are evaluated in order, first match that fires wins. A rule that loses
+#   its probability roll lets later rules try, so a call that dodges the `error`
+#   still hits the `slow` rule below it.
+#
+# What to look for in the report:
+#   - Does the agent back off sanely on intermittent failure, or does it hammer
+#     the tool (watch for a `runaway` verdict building up across flaky calls)?
+#   - Does it distinguish "transient error, retry is fine" from a hard failure?
+#   - Total wall-clock and cost: a slow-but-working dependency can quietly burn
+#     time and tokens even when nothing errors outright.
+#
+# Note: `error` short-circuits (safe on writes); `slow` DOES forward the real call
+# and just delays the reply — point it at test resources.
+
+server:
+  command: "npx -y @modelcontextprotocol/server-github"
+
+faults:
+  - tool: "search_*"             # any search tool (glob)
+    type: error                  # JSON-RPC -32603, service unavailable
+    probability: 0.3             # ~30% of calls fail outright
+
+  - tool: "search_*"             # same tools: when the error roll misses...
+    type: slow                   # ...the call still runs, just degraded
+    delay_ms: 4000               # 4s of added latency before forwarding
