@@ -180,6 +180,68 @@ Things to look for beyond the verdict:
   succeeded; if the agent claimed the task was done anyway, you have a
   claimed-success bug.
 
+## Turning it off and removing it
+
+The proxy lives entirely in your agent's MCP config — it never modifies the real
+server or anything on disk. So "removing it" always means restoring that one
+config entry. Pick whichever pattern fits how you wired it in:
+
+### Best: test with a throwaway config (nothing to undo)
+
+If your client can take a config file for a single run, keep the chaos setup in a
+*separate* file and never touch your normal config. Claude Code does this with
+`--mcp-config`:
+
+```bash
+claude -p "..." --mcp-config chaos.json --strict-mcp-config --allowedTools "mcp__fs"
+```
+
+The proxy exists only for that command. There is nothing to remove afterward —
+delete `chaos.json` if you like. This is the recommended way to run a test.
+
+### Live GUI config (Cursor, Claude Desktop): add a second server + toggle
+
+When you must edit the config the app reads continuously, don't overwrite the
+real server — add the proxy as a **separate named entry** beside it:
+
+```json
+{
+  "mcpServers": {
+    "github":       { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-github"] },
+    "github-chaos": { "command": "uvx", "args": ["--from", "git+https://github.com/SmartAI/mcp-chaos",
+                      "mcp-chaos", "run", "-c", "/abs/faults.yaml", "--record", "/abs/run.jsonl"] }
+  }
+}
+```
+
+Both Cursor and Claude Desktop have a per-server on/off toggle in their MCP
+settings — flip `github-chaos` on for a test, off when done; the real `github`
+server keeps working the whole time. To remove entirely, delete just that one
+block. (Before your first edit, `cp config.json config.json.bak` gives you a
+one-command restore: `mv config.json.bak config.json`.)
+
+### Leave it wired, switch chaos on and off
+
+An empty (or missing) `faults:` list makes mcp-chaos a **transparent relay** —
+identical traffic, nothing injected. So you can leave the proxy in place and
+toggle chaos by swapping which faults file it loads:
+
+```yaml
+# faults-off.yaml
+server:
+  command: "npx -y @modelcontextprotocol/server-filesystem /tmp/demo"
+faults: []          # no-op: pure passthrough
+```
+
+Point `-c` at `faults-off.yaml` for normal use and `faults.yaml` for a test,
+then restart the agent so it reloads. (Restart is needed because MCP servers are
+launched once at agent startup.)
+
+**One safety habit:** name chaos configs and servers clearly (`*-chaos`,
+`faults.yaml`) so you never accidentally ship an agent with faults still wired
+in. Short-circuit faults are harmless to real credentials, but a stray `inject`
+or `corrupt` rule left on is a bad day.
+
 ## Troubleshooting
 
 - **No record file** — make sure `--record` is an absolute path; with a relative

@@ -140,6 +140,19 @@ When summarizing for the user, combine both data sources:
   whether the agent followed the injected instruction.
 - **Cost**: turns, seconds, and dollars burned by the fault.
 
+### 6. Clean up
+
+Leave the agent's config as you found it. The proxy only ever lived in an MCP
+config entry, so:
+
+- If you tested with a throwaway config file (`--mcp-config chaos.json` or a
+  temp file), just delete it — the real config was never touched.
+- If you edited a live config, restore the original server entry (keep a `.bak`
+  before editing). Don't leave a `mcp-chaos run ...` entry — especially not an
+  `inject` or `corrupt` rule — wired into a config the user runs normally.
+- To keep the proxy but disable chaos, point `-c` at a config whose `faults:`
+  list is empty; that makes it a transparent relay.
+
 ## Troubleshooting
 
 - No record file → `--record` path wasn't absolute.
