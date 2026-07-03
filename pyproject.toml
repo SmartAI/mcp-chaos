@@ -1,0 +1,27 @@
+[project]
+name = "mcp-chaos"
+version = "0.0.1"
+description = "Chaos engineering for AI agents — a fault-injecting MCP proxy"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [{ name = "Min Liu", email = "max.liu2024@outlook.com" }]
+keywords = ["mcp", "chaos-engineering", "ai-agents", "testing", "fault-injection"]
+dependencies = [
+    "mcp>=1.0",
+    "pyyaml>=6.0",
+]
+
+[project.urls]
+Repository = "https://github.com/SmartAI/mcp-chaos"
+Issues = "https://github.com/SmartAI/mcp-chaos/issues"
+
+[project.scripts]
+mcp-chaos = "mcp_chaos.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mcp_chaos"]

@@ -1,0 +1,15 @@
+{"t": 12.431, "kind": "tool_call", "tool": "write_file", "detail": {"id": 2}}
+{"t": 12.432, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 2, "mode": "short_circuit"}}
+{"t": 22.187, "kind": "tool_call", "tool": "write_file", "detail": {"id": 3}}
+{"t": 22.187, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 3, "mode": "short_circuit"}}
+{"t": 28.911, "kind": "tool_call", "tool": "read_text_file", "detail": {"id": 4}}
+{"t": 38.415, "kind": "tool_call", "tool": "list_allowed_directories", "detail": {"id": 5}}
+{"t": 42.991, "kind": "tool_call", "tool": "write_file", "detail": {"id": 6}}
+{"t": 42.992, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 6, "mode": "short_circuit"}}
+{"t": 52.132, "kind": "tool_call", "tool": "write_file", "detail": {"id": 7}}
+{"t": 52.132, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 7, "mode": "short_circuit"}}
+{"t": 56.742, "kind": "tool_call", "tool": "list_directory", "detail": {"id": 8}}
+{"t": 66.083, "kind": "tool_call", "tool": "edit_file", "detail": {"id": 9}}
+{"t": 72.088, "kind": "tool_call", "tool": "write_file", "detail": {"id": 10}}
+{"t": 72.089, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 10, "mode": "short_circuit"}}
+{"t": 76.648, "kind": "tool_call", "tool": "get_file_info", "detail": {"id": 11}}
