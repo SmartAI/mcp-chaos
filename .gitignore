@@ -7,7 +7,6 @@ build/
 .pytest_cache/
 .ruff_cache/
 .coverage
-uv.lock
 reports/
 .DS_Store
 private/
