@@ -13,12 +13,12 @@ needs zero code changes — only its MCP config changes.
 Run it with `uvx` (no install step):
 
 ```bash
-uvx --from git+https://github.com/SmartAI/mcp-chaos mcp-chaos --version
+uvx mcp-chaos --version
 ```
 
-If fetching from GitHub is blocked in your environment (sandbox, permission
-policy) or a local checkout exists, use `--from /path/to/mcp-chaos` instead —
-everything below works the same with either form.
+If fetching from PyPI is blocked in your environment (sandbox, permission
+policy) or a local checkout exists, use `uvx --from /path/to/mcp-chaos mcp-chaos`
+instead — everything below works the same with either form.
 
 ## Workflow
 
@@ -72,8 +72,8 @@ Use **absolute paths** — MCP clients pick their own working directory:
     "fs": {
       "command": "uvx",
       "args": [
-        "--from", "git+https://github.com/SmartAI/mcp-chaos", "mcp-chaos",
-        "run", "-c", "/abs/path/faults.yaml", "--record", "/abs/path/run.jsonl"
+        "mcp-chaos", "run",
+        "-c", "/abs/path/faults.yaml", "--record", "/abs/path/run.jsonl"
       ]
     }
   }
@@ -86,7 +86,7 @@ Before spending an agent run, validate the config in one command — this exits
 immediately and surfaces YAML errors or a broken server command:
 
 ```bash
-echo "" | uvx --from git+https://github.com/SmartAI/mcp-chaos mcp-chaos \
+echo "" | uvx mcp-chaos \
   run -c /abs/path/faults.yaml --record /tmp/check.jsonl
 # look for: "mcp-chaos: proxying <cmd> with N fault(s)" on stderr
 ```
@@ -122,7 +122,7 @@ the proxy at session end.
 ### 5. Report and interpret
 
 ```bash
-uvx --from git+https://github.com/SmartAI/mcp-chaos mcp-chaos report /abs/path/run.jsonl -o /abs/path/report.html
+uvx mcp-chaos report /abs/path/run.jsonl -o /abs/path/report.html
 ```
 
 Verdicts (per tool × fault type, counting same-tool calls *after* the first

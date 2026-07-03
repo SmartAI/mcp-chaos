@@ -14,7 +14,13 @@ No account, no API key, no telemetry. Everything runs and stays on your machine.
 
 ## Install
 
-The package is not on PyPI yet; run it straight from GitHub:
+The package is on PyPI, so `uvx` runs it directly — no install step:
+
+```bash
+uvx mcp-chaos --version
+```
+
+To run the latest from `main` instead of the released version:
 
 ```bash
 uvx --from git+https://github.com/SmartAI/mcp-chaos mcp-chaos --version
@@ -96,8 +102,8 @@ Project-level `.mcp.json` (or `~/.claude.json` for user scope):
     "github": {
       "command": "uvx",
       "args": [
-        "--from", "git+https://github.com/SmartAI/mcp-chaos", "mcp-chaos",
-        "run", "-c", "/abs/path/faults.yaml", "--record", "/abs/path/run.jsonl"
+        "mcp-chaos", "run",
+        "-c", "/abs/path/faults.yaml", "--record", "/abs/path/run.jsonl"
       ]
     }
   }
@@ -122,8 +128,8 @@ claude -p "your task here" \
     "github": {
       "command": "uvx",
       "args": [
-        "--from", "git+https://github.com/SmartAI/mcp-chaos", "mcp-chaos",
-        "run", "-c", "/abs/path/faults.yaml", "--record", "/abs/path/run.jsonl"
+        "mcp-chaos", "run",
+        "-c", "/abs/path/faults.yaml", "--record", "/abs/path/run.jsonl"
       ]
     }
   }
@@ -152,7 +158,7 @@ the client kills the proxy mid-session.
 Then render the report:
 
 ```bash
-uvx --from git+https://github.com/SmartAI/mcp-chaos mcp-chaos report /abs/path/run.jsonl -o report.html
+uvx mcp-chaos report /abs/path/run.jsonl -o report.html
 ```
 
 The report is a single HTML file: a summary line, per-tool resilience findings,
@@ -208,8 +214,8 @@ real server — add the proxy as a **separate named entry** beside it:
 {
   "mcpServers": {
     "github":       { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-github"] },
-    "github-chaos": { "command": "uvx", "args": ["--from", "git+https://github.com/SmartAI/mcp-chaos",
-                      "mcp-chaos", "run", "-c", "/abs/faults.yaml", "--record", "/abs/run.jsonl"] }
+    "github-chaos": { "command": "uvx", "args": ["mcp-chaos", "run",
+                      "-c", "/abs/faults.yaml", "--record", "/abs/run.jsonl"] }
   }
 }
 ```

@@ -1,12 +1,20 @@
 [project]
 name = "mcp-chaos"
-version = "0.0.1"
+version = "0.1.0"
 description = "Chaos engineering for AI agents — a fault-injecting MCP proxy"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
 authors = [{ name = "Min Liu", email = "max.liu2024@outlook.com" }]
 keywords = ["mcp", "chaos-engineering", "ai-agents", "testing", "fault-injection"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Testing",
+]
 dependencies = [
     "mcp>=1.0",
     "pyyaml>=6.0",
