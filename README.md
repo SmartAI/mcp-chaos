@@ -129,11 +129,11 @@ EOF
 # 2. In your agent's MCP config, replace the real server with the proxy
 #    (it launches the real server itself — see server.command above):
 #    "command": "uvx",
-#    "args": ["--from", "git+https://github.com/SmartAI/mcp-chaos", "mcp-chaos",
-#             "run", "-c", "/abs/path/faults.yaml", "--record", "/abs/path/run.jsonl"]
+#    "args": ["mcp-chaos", "run", "-c", "/abs/path/faults.yaml",
+#             "--record", "/abs/path/run.jsonl"]
 
 # 3. Use your agent normally, then render the report
-uvx --from git+https://github.com/SmartAI/mcp-chaos mcp-chaos report run.jsonl -o report.html
+uvx mcp-chaos report run.jsonl -o report.html
 ```
 
 **[→ Full setup guide](docs/usage.md)** — copy-paste configs for Claude Code,
