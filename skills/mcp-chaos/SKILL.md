@@ -91,11 +91,11 @@ echo "" | uvx --from git+https://github.com/SmartAI/mcp-chaos mcp-chaos \
 # look for: "mcp-chaos: proxying <cmd> with N fault(s)" on stderr
 ```
 
-Use a **fresh `--record` path per run** (and never the real path for the check
-above). The proxy truncates the file when it starts, so a stale file is never
-mixed in — but that same behavior means a report rendered from the wrong file,
-or a client that restarts the MCP server mid-session, silently drops the
-events you wanted.
+Use a **fresh `--record` path per scenario** (and never the real path for the
+check above). The proxy appends to the file and never truncates it — each
+launch writes a `session_start` marker — so a client that restarts the MCP
+server mid-session loses nothing. The flip side is that reusing a path mixes
+old runs into the new report, so pick a new file when the scenario changes.
 
 For a self-contained test, drive a headless agent yourself rather than waiting
 for an interactive session. With Claude Code as the subject:
@@ -115,9 +115,10 @@ text are the cost-of-failure evidence. This costs real API dollars: budget
 ~$1 / 1–2 min for a frontier model against a dead tool, or add `--model haiku`
 for a ~$0.05–0.10 / 20–35 s smoke test while you're still shaping the scenario.
 
-Each event is flushed to the `--record` file as it happens (the file is
-truncated once at proxy start), so the log survives even if the client kills
-the proxy at session end.
+Each event is flushed to the `--record` file as it happens (the file is opened
+in append mode, with a `session_start` marker per proxy launch), so the log
+survives the client killing the proxy at session end and mid-session server
+restarts alike.
 
 ### 5. Report and interpret
 
