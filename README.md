@@ -2,6 +2,11 @@
 
 **Chaos engineering for AI agents, at the protocol layer.**
 
+![One injected timeout costs a real agent 4 blind retries, 12 turns, 89 seconds, $1.01 — replay of a recorded Claude Code run](docs/demo.gif)
+
+*Real recorded run: one injected `write_file` timeout vs. headless Claude Code — 4 blind
+retries, 12 turns, 89 s, $1.01 burned. [Full experiment →](docs/experiments/2026-07-03-claude-code-timeout.md)*
+
 Your agent works in demos. Production is different: tools time out, APIs rate-limit, results come back malformed or poisoned. Most agent incidents come from tool-call failures — not model quality. `mcp-chaos` is a transparent MCP proxy that sits between any agent and its tools, injects failures you configure, and reports how the agent actually behaves: does it retry sanely, loop forever, or **lie to you that the task succeeded**?
 
 No code changes. No SDK. Point your MCP config at the proxy and break things on purpose — before production does.
