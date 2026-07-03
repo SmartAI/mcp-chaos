@@ -24,6 +24,11 @@ def main(argv: list[str] | None = None) -> int:
     rep = sub.add_parser("report", help="render an HTML report from a run log")
     rep.add_argument("record", help="path to a run.jsonl produced by `run`")
     rep.add_argument("-o", "--out", default="report.html", help="HTML output path")
+    rep.add_argument(
+        "--fail-on", choices=["runaway", "retried"],
+        help="exit 1 if any finding reaches this verdict "
+             "(retried is stricter: any retry, runaway included, fails)",
+    )
 
     args = parser.parse_args(argv)
 
@@ -59,6 +64,19 @@ def _report(args) -> int:
     with open(args.out, "w") as f:
         f.write(report.render(events))
     print(f"mcp-chaos: wrote {args.out}", file=sys.stderr)
+
+    if args.fail_on:
+        from .checks import analyze, summary_line
+
+        failing = {"runaway"} if args.fail_on == "runaway" else {"runaway", "retried"}
+        result = analyze(events)
+        tripped = [f for f in result["findings"] if f.verdict in failing]
+        if tripped:
+            print(f"mcp-chaos: {summary_line(result)}", file=sys.stderr)
+            for f in tripped:
+                print(f"mcp-chaos: FAIL {f.tool} ({f.fault_type}): "
+                      f"{f.verdict}, {f.retries} retries after fault", file=sys.stderr)
+            return 1
     return 0
 
 
