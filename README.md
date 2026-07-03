@@ -7,15 +7,32 @@
 *Real recorded run: one injected `write_file` timeout vs. headless Claude Code — 4 blind
 retries, 12 turns, 89 s, $1.01 burned. [Full experiment →](docs/experiments/2026-07-03-claude-code-timeout.md)*
 
-## What you get
+## Why you need this
 
 Your agent works when everything works. Production is different: tools time out,
-APIs rate-limit, results come back empty, truncated, or poisoned. Most production
-agent incidents come from **tool-call failures, not model quality** — and nothing
-in your stack tests that before you ship.
+rate-limit, return empty or poisoned data — and **most production agent incidents
+come from these tool-call failures, not from the model being wrong.** When it
+happens, does your agent retry sanely, loop and burn money, re-run a payment it
+already made, or tell you "done" when nothing happened? Right now you find out in
+production.
 
-`mcp-chaos` is a transparent proxy that sits between your agent and its MCP tools,
-injects the failures you choose, and gives you a report with evidence:
+Nothing else in your stack tests this **before** you ship:
+
+| Layer | The question it answers | When you learn |
+|---|---|---|
+| **Evals** (Braintrust, LangSmith, DeepEval) | Does the agent do the task right on *good* inputs? | pre-ship |
+| **Observability** (Langfuse, traces) | What *did* the agent do? | after it broke |
+| **mcp-chaos** | How does the agent behave *while its tools are failing*? | **pre-ship** |
+
+Evals check the happy path; observability shows you the wreckage afterward.
+mcp-chaos is the missing pre-production check for **behavior under failure** — the
+axis that decides whether an agent is production-ready, and the one nothing else
+tests before you ship.
+
+## What you get
+
+`mcp-chaos` sits between your agent and its MCP tools, breaks the tools on purpose,
+and hands you a report with evidence:
 
 - **What one dead tool costs you** — retries, wall-clock time, dollars burned
   (the run above: $1.01 for a single timeout).
@@ -28,7 +45,14 @@ injects the failures you choose, and gives you a report with evidence:
 
 **Zero integration cost.** No SDK, no code, no framework lock-in. You change one
 line in your agent's MCP config — that's the whole setup. Works with every MCP
-client: Claude Code, Cursor, Claude Desktop, or anything you built yourself.
+client: Claude Code, Cursor, Claude Desktop, or anything you built yourself, in any
+language — because it works at the protocol layer, not inside your agent.
+
+**One sharp tool, not a whole suite.** mcp-chaos does one thing and does it well:
+behavior-under-failure at the MCP layer. It is *not* your correctness eval harness,
+and it can't touch an agent's built-in (non-MCP) tools. Point it at agents whose
+real work flows through MCP servers — GitHub, a database, an internal API — and it
+tests the failure axis nothing else does.
 
 ## Benchmark: one timeout, six models
 
