@@ -6,10 +6,11 @@ import html
 import json
 
 from .checks import analyze, summary_line
+from .efficiency import profile
 from .recorder import Event
 
 _COLORS = {"tool_call": "#3b82f6", "fault": "#ef4444", "response": "#f59e0b",
-           "session_start": "#6b7280"}
+           "session_start": "#6b7280", "tools_list": "#8b5cf6", "tool_result": "#10b981"}
 _VERDICT_COLORS = {"runaway": "#ef4444", "retried": "#f59e0b", "stopped": "#6b7280"}
 
 
@@ -39,9 +40,39 @@ def render(events: list[Event], title: str = "mcp-chaos run") -> str:
         title=html.escape(title),
         summary=html.escape(summary_line(result)),
         findings="\n".join(finding_rows) or '<tr><td colspan="4">no faults injected</td></tr>',
+        efficiency=_efficiency_section(events),
         rows="\n".join(rows),
         data=json.dumps([e.__dict__ for e in events]),
     )
+
+
+def _efficiency_section(events: list[Event]) -> str:
+    p = profile(events)
+    if not p["has_data"]:
+        return ('<p class="d">no efficiency data in this log — it was recorded by an '
+                'older mcp-chaos without traffic capture.</p>')
+
+    parts = []
+    if p["advertised"] is not None:
+        tax = (f'{p["advertised"]} tools advertised · ~{p["listing_tokens"]} tokens '
+               f'of tool definitions loaded per session')
+        if p["unused"]:
+            tax += f' · {len(p["unused"])} never called: {", ".join(p["unused"])}'
+        parts.append(f'<div class="summary">{html.escape(tax)}</div>')
+
+    tool_rows = []
+    for name, s in sorted(p["tools"].items()):
+        tool_rows.append(
+            f'<tr><td>{html.escape(name)}</td><td>{s["calls"]}</td><td>{s["errors"]}</td>'
+            f'<td>{s["avg_ms"]} ms</td><td>~{s["result_tokens"]} tokens</td>'
+            f'<td>{s["corrected_retries"]}</td></tr>'
+        )
+    parts.append(
+        '<table><thead><tr><th>Tool</th><th>Calls</th><th>Errors</th>'
+        '<th>Avg latency</th><th>Results returned</th><th>Corrected retries</th>'
+        '</tr></thead><tbody>\n' + "\n".join(tool_rows) + '\n</tbody></table>'
+    )
+    return "\n".join(parts)
 
 
 _TEMPLATE = """<!doctype html>
@@ -71,6 +102,9 @@ _TEMPLATE = """<!doctype html>
 {findings}
     </tbody>
   </table>
+
+  <h2>MCP efficiency</h2>
+{efficiency}
 
   <h2>Timeline</h2>
   <table>
