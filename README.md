@@ -73,6 +73,23 @@ uvx --from git+https://github.com/SmartAI/mcp-chaos mcp-chaos report run.jsonl -
 **[→ Full setup guide](docs/usage.md)** — copy-paste configs for Claude Code,
 Cursor, and Claude Desktop, the complete fault reference, and how to read the report.
 
+## For AI agents
+
+Chaos tests are usually *run by* an agent, too. This repo ships an
+[agent skill](skills/mcp-chaos/SKILL.md) that teaches any skill-capable agent
+the whole workflow — writing `faults.yaml`, inserting the proxy into an MCP
+config, driving a headless test run, and interpreting the results:
+
+```bash
+npx skills add SmartAI/mcp-chaos        # skills CLI
+
+# or install manually (Claude Code shown; any SKILL.md-compatible agent works):
+git clone --depth 1 https://github.com/SmartAI/mcp-chaos /tmp/mcp-chaos \
+  && mkdir -p ~/.claude/skills && cp -r /tmp/mcp-chaos/skills/mcp-chaos ~/.claude/skills/
+```
+
+Then ask your agent to "chaos-test my MCP setup" — the skill handles the rest.
+
 ## Fault types
 
 | Fault | What it simulates |
