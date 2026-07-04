@@ -3,7 +3,7 @@ name = "mcp-chaos"
 version = "0.1.0"
 description = "Chaos engineering for AI agents — a fault-injecting MCP proxy"
 readme = "README.md"
-license = "MIT"
+license = "Apache-2.0"
 requires-python = ">=3.11"
 authors = [{ name = "Min Liu", email = "max.liu2024@outlook.com" }]
 keywords = ["mcp", "chaos-engineering", "ai-agents", "testing", "fault-injection"]
