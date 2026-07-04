@@ -1,0 +1,22 @@
+{"t": 0.0, "kind": "session_start", "tool": null, "detail": {"started_at": "2026-07-04T00:26:59+00:00", "command": "npx -y @modelcontextprotocol/server-filesystem /tmp/orbench-google-gemini-3-flash-preview", "faults": 1}}
+{"t": 0.45, "kind": "tools_list", "tool": null, "detail": {"count": 14, "chars": 12272, "tools": ["read_file", "read_text_file", "read_media_file", "read_multiple_files", "write_file", "edit_file", "create_directory", "list_directory", "list_directory_with_sizes", "directory_tree", "move_file", "search_files", "get_file_info", "list_allowed_directories"]}}
+{"t": 1.414, "kind": "tool_call", "tool": "list_allowed_directories", "detail": {"id": 3, "args_chars": 2, "args_hash": "99914b93"}}
+{"t": 1.421, "kind": "tool_result", "tool": "list_allowed_directories", "detail": {"id": 3, "ok": true, "ms": 6, "chars": 253}}
+{"t": 2.548, "kind": "tool_call", "tool": "create_directory", "detail": {"id": 4, "args_chars": 62, "args_hash": "01c7c5b4"}}
+{"t": 2.552, "kind": "tool_result", "tool": "create_directory", "detail": {"id": 4, "ok": true, "ms": 4, "chars": 271}}
+{"t": 4.04, "kind": "tool_call", "tool": "write_file", "detail": {"id": 5, "args_chars": 107, "args_hash": "d26e5c23"}}
+{"t": 4.041, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 5, "mode": "short_circuit"}}
+{"t": 5.132, "kind": "tool_call", "tool": "list_directory", "detail": {"id": 6, "args_chars": 62, "args_hash": "01c7c5b4"}}
+{"t": 5.138, "kind": "tool_result", "tool": "list_directory", "detail": {"id": 6, "ok": true, "ms": 6, "chars": 109}}
+{"t": 6.264, "kind": "tool_call", "tool": "write_file", "detail": {"id": 7, "args_chars": 107, "args_hash": "d26e5c23"}}
+{"t": 6.264, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 7, "mode": "short_circuit"}}
+{"t": 7.696, "kind": "tool_call", "tool": "get_file_info", "detail": {"id": 8, "args_chars": 73, "args_hash": "c629e13c"}}
+{"t": 7.697, "kind": "tool_result", "tool": "get_file_info", "detail": {"id": 8, "ok": false, "ms": 1, "chars": 192}}
+{"t": 8.837, "kind": "tool_call", "tool": "write_file", "detail": {"id": 9, "args_chars": 107, "args_hash": "d26e5c23"}}
+{"t": 8.838, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 9, "mode": "short_circuit"}}
+{"t": 9.897, "kind": "tool_call", "tool": "list_directory", "detail": {"id": 10, "args_chars": 62, "args_hash": "01c7c5b4"}}
+{"t": 9.899, "kind": "tool_result", "tool": "list_directory", "detail": {"id": 10, "ok": true, "ms": 2, "chars": 110}}
+{"t": 11.133, "kind": "tool_call", "tool": "write_file", "detail": {"id": 11, "args_chars": 107, "args_hash": "d26e5c23"}}
+{"t": 11.133, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 11, "mode": "short_circuit"}}
+{"t": 12.444, "kind": "tool_call", "tool": "list_directory", "detail": {"id": 12, "args_chars": 62, "args_hash": "01c7c5b4"}}
+{"t": 12.447, "kind": "tool_result", "tool": "list_directory", "detail": {"id": 12, "ok": true, "ms": 3, "chars": 110}}
