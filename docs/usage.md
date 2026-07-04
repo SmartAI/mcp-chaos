@@ -248,6 +248,30 @@ Token figures use a chars/4 estimate — rough, but stable enough to rank where
 your context goes. This also works during a chaos run: the efficiency section
 appears in every report.
 
+## Doctor your MCP config (no agent required)
+
+`doctor` checks an MCP client config *before* any agent runs — it launches each
+stdio server, performs the initialize → tools/list handshake, and reports:
+
+```bash
+uvx mcp-chaos doctor .mcp.json            # or claude_desktop_config.json, Cursor's mcp.json
+```
+
+```
+✔ filesystem: 14 tools · ~3214 tokens of definitions · ready in 774 ms
+✘ github: timed out after 20s waiting for initialize/tools list
+⚠ tool name collision: read_file (filesystem, repo-fs)
+3 server(s) · 27 tools · ~6400 tokens of tool definitions per session
+1 problem(s) found
+```
+
+Per server: does it launch and respond, how many tools it advertises, the
+~context-token cost of those definitions (chars/4, same heuristic as the
+efficiency profile), and startup latency. Across servers: tool-name collisions.
+Exit code is 1 when any server is broken, so it drops straight into CI.
+HTTP/SSE entries are listed but not checked (stdio only today); `--timeout`
+adjusts the per-server wait (default 20 s — first `npx -y` downloads can be slow).
+
 ## Correlate the transcript: did the agent lie?
 
 The run log proves what the tools did. The transcript shows what the agent told
