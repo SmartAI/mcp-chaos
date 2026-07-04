@@ -73,6 +73,19 @@ Exactly one of `command` / `url` is required. Session ids and SSE-streamed
 responses are handled; the server's optional GET listening stream (for
 server-initiated requests) is not opened.
 
+Here's a real session against Context7's hosted endpoint with an `error`
+fault on `query-docs` — the un-faulted call hits the live backend, the
+faulted one never leaves the proxy:
+
+```
+server: {"name": "Context7", "version": "3.2.2", "websiteUrl": "https://context7.com", "description": "Context7 provides up-to-d ...
+tools: ['resolve-library-id', 'query-docs']
+resolve-library-id (live, un-faulted): Available Libraries: ...
+query-docs (fault injected): {"code": -32603, "message": "Internal error: service unavailable"}
+```
+
+*Real run — [artifacts](experiments/2026-07-03-http-transport.md).*
+
 ### Fault rule reference
 
 | Field | Required | Default | Meaning |
