@@ -187,6 +187,13 @@
     </table>
     <p><small>N=1 per model — a seed, not a robust benchmark; the OpenAI rows are preliminary.
     <a href="https://github.com/SmartAI/mcp-chaos/blob/main/docs/experiments/2026-07-03-cross-agent-timeout.md">Read the fine print →</a></small></p>
+    <p>We then held the harness constant — a minimal ~150-line reference agent, ships in the
+    repo — and ran the <b>same timeout against 12 models across 8 vendors</b> via OpenRouter.
+    One model <span class="bad">fabricated success</span> ("existence has been verified" —
+    over an empty directory its own tool call returned); three burned the entire turn budget
+    and <b>never answered at all</b>; one quit after a single attempt and blamed the wrong
+    cause. Total cost of finding all that: $0.22.
+    <a href="https://github.com/SmartAI/mcp-chaos/blob/main/docs/experiments/2026-07-03-openrouter-12-models.md">The 12-model writeup →</a></p>
   </section>
 
   <section class="event" style="--dot: var(--amber)">
