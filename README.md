@@ -35,7 +35,7 @@ you built yourself.
 | MCP efficiency profile (zero-fault mode) | Context-token cost of tool definitions, dead tools, per-tool latency, schema friction | ✅ shipped |
 | Append-safe JSONL recording → single-file HTML report | Evidence you can read, share, and audit | ✅ shipped |
 | [Agent skill](skills/mcp-chaos/SKILL.md) | Your agent runs the whole test itself: "chaos-test my MCP setup" | ✅ shipped |
-| Record & replay | Hermetic tool mocks: deterministic, zero-cost CI runs and a dev-time cache | 📋 planned |
+| Record & replay | Hermetic tool mocks: deterministic, zero-cost CI runs and a dev-time cache | ✅ shipped |
 | Transcript correlation | Did the agent claim success while the tool failed? | 📋 planned |
 | Duplicate-write detection + `--fail-on duplicate-write` | Did a timeout retry double-execute a write? | ✅ shipped |
 | MCP config doctor | Do your servers launch, collide, or bloat your context — before the agent runs? | 📋 planned |

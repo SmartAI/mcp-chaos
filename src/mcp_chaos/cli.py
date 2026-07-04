@@ -20,6 +20,14 @@ def main(argv: list[str] | None = None) -> int:
     run = sub.add_parser("run", help="run the proxy in front of a real MCP server")
     run.add_argument("-c", "--config", required=True, help="path to faults.yaml")
     run.add_argument("--record", default="run.jsonl", help="event log output path")
+    run.add_argument("--cassette",
+                     help="also capture every agent-visible response to this "
+                          "file, for later hermetic `replay`")
+
+    rpl = sub.add_parser("replay",
+                         help="serve a recorded cassette as a standalone MCP "
+                              "server — no real server, deterministic, zero cost")
+    rpl.add_argument("cassette", help="path to a cassette recorded by `run --cassette`")
 
     rep = sub.add_parser("report", help="render an HTML report from a run log")
     rep.add_argument("record", help="path to a run.jsonl produced by `run`")
@@ -36,20 +44,34 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.cmd == "run":
         return _run(args)
+    if args.cmd == "replay":
+        return _replay(args)
     if args.cmd == "report":
         return _report(args)
     return 1
 
 
 def _run(args) -> int:
+    from .cassette import CassetteWriter
     from .recorder import Recorder
 
     cfg = config.load(args.config)
     recorder = Recorder(args.record, command=cfg.command, faults=len(cfg.faults))
+    cassette = CassetteWriter(args.cassette) if args.cassette else None
     # Startup notice goes to stderr so it never corrupts the stdio JSON-RPC stream.
     print(f"mcp-chaos: proxying `{cfg.command}` with {len(cfg.faults)} fault(s)",
           file=sys.stderr)
-    return asyncio.run(proxy.run(cfg, recorder))
+    return asyncio.run(proxy.run(cfg, recorder, cassette))
+
+
+def _replay(args) -> int:
+    from .cassette import Cassette, serve
+
+    cassette = Cassette.load(args.cassette)
+    print(f"mcp-chaos: replaying {args.cassette} — no real server behind this",
+          file=sys.stderr)
+    serve(cassette, sys.stdin, sys.stdout)
+    return 0
 
 
 def _report(args) -> int:
