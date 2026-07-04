@@ -39,7 +39,7 @@ you built yourself.
 | Transcript correlation — `mcp-chaos correlate` | Did the agent claim success while the tool failed? | ✅ shipped |
 | Duplicate-write detection + `--fail-on duplicate-write` | Did a timeout retry double-execute a write? | ✅ shipped |
 | MCP config doctor — `mcp-chaos doctor` | Do your servers launch, collide, or bloat your context — before the agent runs? | ✅ shipped |
-| Streamable HTTP transport | Hosted MCP servers (GitHub, Sentry, ...) | 📋 planned |
+| Streamable HTTP transport — `server.url` | Hosted MCP servers (GitHub, Sentry, ...) | ✅ shipped |
 
 ## Quickstart
 
@@ -114,8 +114,8 @@ how it works, fault types, profile mode, and report screenshots.
 
 ## Honest scope
 
-The proxy sees MCP tool traffic (stdio servers today), not the agent's chat
-output. `mcp-chaos correlate` closes that gap when you hand it the transcript
+The proxy sees MCP tool traffic (stdio servers and hosted Streamable HTTP
+servers), not the agent's chat output. `mcp-chaos correlate` closes that gap when you hand it the transcript
 (a Claude Code session `.jsonl` or the final answer as text) — the proxy alone
 still can't see what the agent told your user, and the success/failure language
 rules are deliberately simple and auditable, not NLP.

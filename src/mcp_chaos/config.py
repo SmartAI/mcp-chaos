@@ -27,8 +27,15 @@ class Fault:
 
 @dataclass
 class Config:
-    command: str  # command that launches the real MCP server
+    command: str | None = None  # command that launches a stdio MCP server, or
+    url: str | None = None  # a hosted server's Streamable HTTP endpoint
+    headers: dict = field(default_factory=dict)  # extra HTTP headers (auth, ...)
+    http_timeout: float = 60.0  # seconds per upstream HTTP request
     faults: list[Fault] = field(default_factory=list)
+
+    @property
+    def target(self) -> str:
+        return self.command or self.url or ""
 
 
 def load(path: str) -> Config:
@@ -37,8 +44,10 @@ def load(path: str) -> Config:
 
     server = raw.get("server") or {}
     command = server.get("command")
-    if not command:
-        raise ValueError("config: `server.command` is required")
+    url = server.get("url")
+    if bool(command) == bool(url):
+        raise ValueError("config: exactly one of `server.command` (stdio) or "
+                         "`server.url` (Streamable HTTP) is required")
 
     faults = []
     for i, item in enumerate(raw.get("faults") or []):
@@ -61,4 +70,7 @@ def load(path: str) -> Config:
             )
         )
 
-    return Config(command=command, faults=faults)
+    return Config(command=command, url=url,
+                  headers=server.get("headers") or {},
+                  http_timeout=float(server.get("http_timeout", 60)),
+                  faults=faults)
