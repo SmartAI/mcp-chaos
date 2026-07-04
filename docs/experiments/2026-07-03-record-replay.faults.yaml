@@ -1,0 +1,3 @@
+server:
+  command: "npx -y @modelcontextprotocol/server-filesystem /tmp/chaos-replay"
+faults: []

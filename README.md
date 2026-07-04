@@ -30,16 +30,30 @@ you built yourself.
 
 | Capability | The question it answers | Status |
 |---|---|---|
-| Fault injection — 7 types: `timeout`, `error`, `rate_limit`, `slow`, `empty`, `corrupt`, `inject` | What does one dead, degraded, or poisoned tool do to your agent? | ✅ shipped |
-| Deterministic resilience verdicts + `--fail-on` exit code | Does it loop? Blind-retry writes? Gate CI on the answer | ✅ shipped |
-| MCP efficiency profile (zero-fault mode) | Context-token cost of tool definitions, dead tools, per-tool latency, schema friction | ✅ shipped |
+| Fault injection — 7 types: `timeout`, `error`, `rate_limit`, `slow`, `empty`, `corrupt`, `inject` ([example](#benchmark-one-timeout-12-models-5-runs-each)) | What does one dead, degraded, or poisoned tool do to your agent? | ✅ shipped |
+| Deterministic resilience verdicts + `--fail-on` exit code ([example](docs/usage.md#reading-the-verdicts)) | Does it loop? Blind-retry writes? Gate CI on the answer | ✅ shipped |
+| MCP efficiency profile (zero-fault mode) ([example](docs/experiments/2026-07-03-context-tax.md)) | Context-token cost of tool definitions, dead tools, per-tool latency, schema friction | ✅ shipped |
 | Append-safe JSONL recording → single-file HTML report | Evidence you can read, share, and audit | ✅ shipped |
 | [Agent skill](skills/mcp-chaos/SKILL.md) | Your agent runs the whole test itself: "chaos-test my MCP setup" | ✅ shipped |
-| Record & replay | Hermetic tool mocks: deterministic, zero-cost CI runs and a dev-time cache | ✅ shipped |
-| Transcript correlation — `mcp-chaos correlate` | Did the agent claim success while the tool failed? | ✅ shipped |
-| Duplicate-write detection + `--fail-on duplicate-write` | Did a timeout retry double-execute a write? | ✅ shipped |
-| MCP config doctor — `mcp-chaos doctor` | Do your servers launch, collide, or bloat your context — before the agent runs? | ✅ shipped |
-| Streamable HTTP transport — `server.url` | Hosted MCP servers (GitHub, Sentry, ...) | ✅ shipped |
+| Record & replay ([example](docs/usage.md#record--replay-hermetic-tool-mocks)) | Hermetic tool mocks: deterministic, zero-cost CI runs and a dev-time cache | ✅ shipped |
+| Transcript correlation — `mcp-chaos correlate` ([example](docs/usage.md#correlate-the-transcript-did-the-agent-lie)) | Did the agent claim success while the tool failed? | ✅ shipped |
+| Duplicate-write detection + `--fail-on duplicate-write` ([example](docs/usage.md#reading-the-verdicts)) | Did a timeout retry double-execute a write? | ✅ shipped |
+| MCP config doctor — `mcp-chaos doctor` ([example](docs/usage.md#doctor-your-mcp-config-no-agent-required)) | Do your servers launch, collide, or bloat your context — before the agent runs? | ✅ shipped |
+| Streamable HTTP transport — `server.url` ([example](docs/usage.md#step-1--write-faultsyaml)) | Hosted MCP servers (Context7, Sentry, ...) | ✅ shipped |
+
+**Every row above is measured, not promised** — each example link goes to real
+captured output with the raw logs committed under
+[`docs/experiments/`](docs/experiments/). From today's runs alone: `doctor`
+flagged a broken server and 14 silent tool-name collisions in a five-server
+config in about a second, before any agent burned a session on them, and priced
+the config at ~7.6k context tokens per session. A `slow` fault on `write_file`
+made headless Claude Code report *"the operation could not be completed"* while
+`status.txt` sat on disk — the blind-retry-a-write hazard, caught by
+`--fail-on duplicate-write` as a CI exit code. And `correlate` caught
+qwen3-235b claiming *"The task SUCCEEDED"* over an empty sandbox (1 lie in 14
+runs — probabilistic, which is why it's a CI gate and not a manual test). All
+of it from changing one line of MCP config: no agent code, no SDK, and every
+verdict is a documented rule you can audit, not a judgment call.
 
 ## Quickstart
 

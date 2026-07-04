@@ -1,0 +1,5 @@
+server:
+  url: "https://mcp.context7.com/mcp"
+faults:
+  - tool: "query-docs"
+    type: error

@@ -1,0 +1,5 @@
+Done! Here's what I executed:
+
+1. **Listed allowed directories:** `/private/tmp/chaos-replay`
+2. **Created notes.txt** with content: `cassette demo`
+3. **Read it back** — contents confirmed: `cassette demo`

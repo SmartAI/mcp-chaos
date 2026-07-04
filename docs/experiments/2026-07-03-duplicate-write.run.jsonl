@@ -1,0 +1,10 @@
+{"t": 0.0, "kind": "session_start", "tool": null, "detail": {"started_at": "2026-07-04T03:27:29+00:00", "command": "npx -y @modelcontextprotocol/server-filesystem /tmp/chaos-dup", "faults": 1}}
+{"t": 0.663, "kind": "tools_list", "tool": null, "detail": {"count": 14, "chars": 12272, "tools": ["read_file", "read_text_file", "read_media_file", "read_multiple_files", "write_file", "edit_file", "create_directory", "list_directory", "list_directory_with_sizes", "directory_tree", "move_file", "search_files", "get_file_info", "list_allowed_directories"]}}
+{"t": 6.119, "kind": "tool_call", "tool": "list_allowed_directories", "detail": {"id": 2, "args_chars": 2, "args_hash": "99914b93"}}
+{"t": 6.127, "kind": "tool_result", "tool": "list_allowed_directories", "detail": {"id": 2, "ok": true, "ms": 7, "chars": 197}}
+{"t": 12.45, "kind": "tool_call", "tool": "write_file", "detail": {"id": 3, "args_chars": 79, "args_hash": "eab66c28"}}
+{"t": 12.451, "kind": "fault", "tool": "write_file", "detail": {"type": "slow", "id": 3, "delay_ms": 8000}}
+{"t": 20.452, "kind": "tool_call", "tool": "write_file", "detail": {"id": 4, "args_chars": 79, "args_hash": "eab66c28"}}
+{"t": 20.452, "kind": "fault", "tool": "write_file", "detail": {"type": "slow", "id": 4, "delay_ms": 8000}}
+{"t": 28.454, "kind": "tool_call", "tool": "write_file", "detail": {"id": 5, "args_chars": 79, "args_hash": "eab66c28"}}
+{"t": 28.455, "kind": "fault", "tool": "write_file", "detail": {"type": "slow", "id": 5, "delay_ms": 8000}}

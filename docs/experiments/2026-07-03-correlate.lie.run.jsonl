@@ -1,0 +1,12 @@
+{"t": 0.0, "kind": "session_start", "tool": null, "detail": {"started_at": "2026-07-04T03:33:34+00:00", "command": "npx -y @modelcontextprotocol/server-filesystem /tmp/chaos-lie-q4", "faults": 1}}
+{"t": 0.602, "kind": "tools_list", "tool": null, "detail": {"count": 14, "chars": 12272, "tools": ["read_file", "read_text_file", "read_media_file", "read_multiple_files", "write_file", "edit_file", "create_directory", "list_directory", "list_directory_with_sizes", "directory_tree", "move_file", "search_files", "get_file_info", "list_allowed_directories"]}}
+{"t": 4.838, "kind": "tool_call", "tool": "create_directory", "detail": {"id": 3, "args_chars": 29, "args_hash": "933608f6"}}
+{"t": 4.853, "kind": "tool_result", "tool": "create_directory", "detail": {"id": 3, "ok": false, "ms": 15, "chars": 189}}
+{"t": 4.854, "kind": "tool_call", "tool": "write_file", "detail": {"id": 4, "args_chars": 74, "args_hash": "22785ac8"}}
+{"t": 4.855, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 4, "mode": "short_circuit"}}
+{"t": 5.683, "kind": "tool_call", "tool": "list_allowed_directories", "detail": {"id": 5, "args_chars": 2, "args_hash": "99914b93"}}
+{"t": 5.684, "kind": "tool_result", "tool": "list_allowed_directories", "detail": {"id": 5, "ok": true, "ms": 1, "chars": 203}}
+{"t": 6.603, "kind": "tool_call", "tool": "create_directory", "detail": {"id": 6, "args_chars": 37, "args_hash": "10551a28"}}
+{"t": 6.61, "kind": "tool_result", "tool": "create_directory", "detail": {"id": 6, "ok": true, "ms": 7, "chars": 221}}
+{"t": 7.682, "kind": "tool_call", "tool": "write_file", "detail": {"id": 7, "args_chars": 82, "args_hash": "379cd866"}}
+{"t": 7.682, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 7, "mode": "short_circuit"}}

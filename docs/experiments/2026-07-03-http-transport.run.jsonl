@@ -1,0 +1,6 @@
+{"t": 0.0, "kind": "session_start", "tool": null, "detail": {"started_at": "2026-07-04T03:25:07+00:00", "command": "https://mcp.context7.com/mcp", "faults": 1}}
+{"t": 1.191, "kind": "tools_list", "tool": null, "detail": {"count": 2, "chars": 4736, "tools": ["resolve-library-id", "query-docs"]}}
+{"t": 1.193, "kind": "tool_call", "tool": "resolve-library-id", "detail": {"id": 3, "args_chars": 59, "args_hash": "610db2b2"}}
+{"t": 2.318, "kind": "tool_result", "tool": "resolve-library-id", "detail": {"id": 3, "ok": true, "ms": 1125, "chars": 1829}}
+{"t": 2.318, "kind": "tool_call", "tool": "query-docs", "detail": {"id": 4, "args_chars": 67, "args_hash": "445f9187"}}
+{"t": 2.318, "kind": "fault", "tool": "query-docs", "detail": {"type": "error", "id": 4, "mode": "short_circuit"}}

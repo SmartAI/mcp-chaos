@@ -1,0 +1,21 @@
+✔ filesystem: 14 tools · ~3214 tokens of definitions · ready in 546 ms
+✔ repo-fs: 14 tools · ~3214 tokens of definitions · ready in 536 ms
+✔ context7: 2 tools · ~1171 tokens of definitions · ready in 638 ms
+✘ github: launch failed: [Errno 2] No such file or directory: 'github-mcp-server-not-installed'
+- sentry: skipped — HTTP transport not checked yet (https://mcp.sentry.dev/mcp)
+⚠ tool name collision: create_directory (filesystem, repo-fs)
+⚠ tool name collision: directory_tree (filesystem, repo-fs)
+⚠ tool name collision: edit_file (filesystem, repo-fs)
+⚠ tool name collision: get_file_info (filesystem, repo-fs)
+⚠ tool name collision: list_allowed_directories (filesystem, repo-fs)
+⚠ tool name collision: list_directory (filesystem, repo-fs)
+⚠ tool name collision: list_directory_with_sizes (filesystem, repo-fs)
+⚠ tool name collision: move_file (filesystem, repo-fs)
+⚠ tool name collision: read_file (filesystem, repo-fs)
+⚠ tool name collision: read_media_file (filesystem, repo-fs)
+⚠ tool name collision: read_multiple_files (filesystem, repo-fs)
+⚠ tool name collision: read_text_file (filesystem, repo-fs)
+⚠ tool name collision: search_files (filesystem, repo-fs)
+⚠ tool name collision: write_file (filesystem, repo-fs)
+5 server(s) · 30 tools · ~7599 tokens of tool definitions per session
+1 problem(s) found

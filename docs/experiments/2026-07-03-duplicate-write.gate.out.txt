@@ -1,0 +1,3 @@
+mcp-chaos: wrote /tmp/chaos-dup-report.html
+mcp-chaos: 4 tool calls · 3 faults injected
+mcp-chaos: FAIL write_file (args eab66c28): replayed_after_fault, sent 3x, executed ok 0x

@@ -1,0 +1,6 @@
+Done. 
+
+**Results:**
+1. **Allowed directory:** `/private/tmp/chaos-replay`
+2. **File created:** `/private/tmp/chaos-replay/notes.txt`
+3. **File contents:** `cassette demo`
