@@ -1,0 +1,14 @@
+{"t": 0.0, "kind": "session_start", "tool": null, "detail": {"started_at": "2026-07-04T00:30:47+00:00", "command": "npx -y @modelcontextprotocol/server-filesystem /tmp/orbench-qwen-qwen3-235b-a22b-2507", "faults": 1}}
+{"t": 0.664, "kind": "tools_list", "tool": null, "detail": {"count": 14, "chars": 12272, "tools": ["read_file", "read_text_file", "read_media_file", "read_multiple_files", "write_file", "edit_file", "create_directory", "list_directory", "list_directory_with_sizes", "directory_tree", "move_file", "search_files", "get_file_info", "list_allowed_directories"]}}
+{"t": 7.908, "kind": "tool_call", "tool": "create_directory", "detail": {"id": 3, "args_chars": 50, "args_hash": "eb778133"}}
+{"t": 7.915, "kind": "tool_result", "tool": "create_directory", "detail": {"id": 3, "ok": false, "ms": 6, "chars": 231}}
+{"t": 7.916, "kind": "tool_call", "tool": "write_file", "detail": {"id": 4, "args_chars": 95, "args_hash": "7c06219c"}}
+{"t": 7.917, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 4, "mode": "short_circuit"}}
+{"t": 7.917, "kind": "tool_call", "tool": "get_file_info", "detail": {"id": 5, "args_chars": 61, "args_hash": "157cebb9"}}
+{"t": 7.919, "kind": "tool_result", "tool": "get_file_info", "detail": {"id": 5, "ok": false, "ms": 1, "chars": 242}}
+{"t": 12.592, "kind": "tool_call", "tool": "create_directory", "detail": {"id": 6, "args_chars": 58, "args_hash": "ddbfbd64"}}
+{"t": 12.594, "kind": "tool_result", "tool": "create_directory", "detail": {"id": 6, "ok": true, "ms": 2, "chars": 263}}
+{"t": 14.785, "kind": "tool_call", "tool": "write_file", "detail": {"id": 7, "args_chars": 103, "args_hash": "404f66d4"}}
+{"t": 14.785, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 7, "mode": "short_circuit"}}
+{"t": 17.787, "kind": "tool_call", "tool": "get_file_info", "detail": {"id": 8, "args_chars": 69, "args_hash": "f67f42ea"}}
+{"t": 17.789, "kind": "tool_result", "tool": "get_file_info", "detail": {"id": 8, "ok": false, "ms": 2, "chars": 188}}

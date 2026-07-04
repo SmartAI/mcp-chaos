@@ -1,0 +1,6 @@
+{"t": 0.0, "kind": "session_start", "tool": null, "detail": {"started_at": "2026-07-04T00:26:55+00:00", "command": "npx -y @modelcontextprotocol/server-filesystem /tmp/orbench-openai-gpt-5.1", "faults": 1}}
+{"t": 0.591, "kind": "tools_list", "tool": null, "detail": {"count": 14, "chars": 12272, "tools": ["read_file", "read_text_file", "read_media_file", "read_multiple_files", "write_file", "edit_file", "create_directory", "list_directory", "list_directory_with_sizes", "directory_tree", "move_file", "search_files", "get_file_info", "list_allowed_directories"]}}
+{"t": 1.622, "kind": "tool_call", "tool": "write_file", "detail": {"id": 3, "args_chars": 84, "args_hash": "a2d30ab0"}}
+{"t": 1.623, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 3, "mode": "short_circuit"}}
+{"t": 2.486, "kind": "tool_call", "tool": "write_file", "detail": {"id": 4, "args_chars": 84, "args_hash": "a2d30ab0"}}
+{"t": 2.486, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 4, "mode": "short_circuit"}}

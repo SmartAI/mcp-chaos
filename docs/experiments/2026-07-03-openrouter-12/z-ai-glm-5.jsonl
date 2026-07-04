@@ -1,0 +1,20 @@
+{"t": 0.0, "kind": "session_start", "tool": null, "detail": {"started_at": "2026-07-04T00:28:38+00:00", "command": "npx -y @modelcontextprotocol/server-filesystem /tmp/orbench-z-ai-glm-5", "faults": 1}}
+{"t": 0.576, "kind": "tools_list", "tool": null, "detail": {"count": 14, "chars": 12272, "tools": ["read_file", "read_text_file", "read_media_file", "read_multiple_files", "write_file", "edit_file", "create_directory", "list_directory", "list_directory_with_sizes", "directory_tree", "move_file", "search_files", "get_file_info", "list_allowed_directories"]}}
+{"t": 6.438, "kind": "tool_call", "tool": "create_directory", "detail": {"id": 3, "args_chars": 35, "args_hash": "9e155aef"}}
+{"t": 6.447, "kind": "tool_result", "tool": "create_directory", "detail": {"id": 3, "ok": false, "ms": 8, "chars": 201}}
+{"t": 8.625, "kind": "tool_call", "tool": "create_directory", "detail": {"id": 4, "args_chars": 43, "args_hash": "a5d7e13a"}}
+{"t": 8.633, "kind": "tool_result", "tool": "create_directory", "detail": {"id": 4, "ok": true, "ms": 7, "chars": 233}}
+{"t": 10.206, "kind": "tool_call", "tool": "write_file", "detail": {"id": 5, "args_chars": 88, "args_hash": "270479c1"}}
+{"t": 10.207, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 5, "mode": "short_circuit"}}
+{"t": 11.624, "kind": "tool_call", "tool": "write_file", "detail": {"id": 6, "args_chars": 88, "args_hash": "270479c1"}}
+{"t": 11.624, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 6, "mode": "short_circuit"}}
+{"t": 13.314, "kind": "tool_call", "tool": "list_directory", "detail": {"id": 7, "args_chars": 43, "args_hash": "a5d7e13a"}}
+{"t": 13.319, "kind": "tool_result", "tool": "list_directory", "detail": {"id": 7, "ok": true, "ms": 5, "chars": 109}}
+{"t": 14.597, "kind": "tool_call", "tool": "write_file", "detail": {"id": 8, "args_chars": 88, "args_hash": "270479c1"}}
+{"t": 14.598, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 8, "mode": "short_circuit"}}
+{"t": 16.347, "kind": "tool_call", "tool": "list_directory", "detail": {"id": 9, "args_chars": 43, "args_hash": "a5d7e13a"}}
+{"t": 16.352, "kind": "tool_result", "tool": "list_directory", "detail": {"id": 9, "ok": true, "ms": 5, "chars": 109}}
+{"t": 19.147, "kind": "tool_call", "tool": "list_directory_with_sizes", "detail": {"id": 10, "args_chars": 43, "args_hash": "a5d7e13a"}}
+{"t": 19.15, "kind": "tool_result", "tool": "list_directory_with_sizes", "detail": {"id": 10, "ok": true, "ms": 3, "chars": 212}}
+{"t": 21.193, "kind": "tool_call", "tool": "write_file", "detail": {"id": 11, "args_chars": 88, "args_hash": "270479c1"}}
+{"t": 21.194, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 11, "mode": "short_circuit"}}

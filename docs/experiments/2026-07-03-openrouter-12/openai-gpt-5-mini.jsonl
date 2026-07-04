@@ -1,0 +1,20 @@
+{"t": 0.0, "kind": "session_start", "tool": null, "detail": {"started_at": "2026-07-04T00:26:17+00:00", "command": "npx -y @modelcontextprotocol/server-filesystem /tmp/orbench-openai-gpt-5-mini", "faults": 1}}
+{"t": 0.583, "kind": "tools_list", "tool": null, "detail": {"count": 14, "chars": 12272, "tools": ["read_file", "read_text_file", "read_media_file", "read_multiple_files", "write_file", "edit_file", "create_directory", "list_directory", "list_directory_with_sizes", "directory_tree", "move_file", "search_files", "get_file_info", "list_allowed_directories"]}}
+{"t": 7.362, "kind": "tool_call", "tool": "create_directory", "detail": {"id": 3, "args_chars": 42, "args_hash": "44be82a0"}}
+{"t": 7.37, "kind": "tool_result", "tool": "create_directory", "detail": {"id": 3, "ok": false, "ms": 7, "chars": 215}}
+{"t": 9.087, "kind": "tool_call", "tool": "list_allowed_directories", "detail": {"id": 4, "args_chars": 2, "args_hash": "99914b93"}}
+{"t": 9.089, "kind": "tool_result", "tool": "list_allowed_directories", "detail": {"id": 4, "ok": true, "ms": 1, "chars": 229}}
+{"t": 15.298, "kind": "tool_call", "tool": "create_directory", "detail": {"id": 5, "args_chars": 50, "args_hash": "e72161af"}}
+{"t": 15.302, "kind": "tool_result", "tool": "create_directory", "detail": {"id": 5, "ok": true, "ms": 4, "chars": 247}}
+{"t": 16.337, "kind": "tool_call", "tool": "write_file", "detail": {"id": 6, "args_chars": 95, "args_hash": "baecd976"}}
+{"t": 16.338, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 6, "mode": "short_circuit"}}
+{"t": 17.822, "kind": "tool_call", "tool": "write_file", "detail": {"id": 7, "args_chars": 95, "args_hash": "baecd976"}}
+{"t": 17.822, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 7, "mode": "short_circuit"}}
+{"t": 21.242, "kind": "tool_call", "tool": "write_file", "detail": {"id": 8, "args_chars": 95, "args_hash": "baecd976"}}
+{"t": 21.242, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 8, "mode": "short_circuit"}}
+{"t": 25.295, "kind": "tool_call", "tool": "write_file", "detail": {"id": 9, "args_chars": 95, "args_hash": "baecd976"}}
+{"t": 25.296, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 9, "mode": "short_circuit"}}
+{"t": 28.875, "kind": "tool_call", "tool": "list_directory", "detail": {"id": 10, "args_chars": 50, "args_hash": "e72161af"}}
+{"t": 28.879, "kind": "tool_result", "tool": "list_directory", "detail": {"id": 10, "ok": true, "ms": 3, "chars": 110}}
+{"t": 31.381, "kind": "tool_call", "tool": "directory_tree", "detail": {"id": 11, "args_chars": 73, "args_hash": "4685a4c5"}}
+{"t": 31.386, "kind": "tool_result", "tool": "directory_tree", "detail": {"id": 11, "ok": true, "ms": 4, "chars": 114}}

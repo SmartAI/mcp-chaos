@@ -1,0 +1,30 @@
+{"t": 0.0, "kind": "session_start", "tool": null, "detail": {"started_at": "2026-07-04T00:25:43+00:00", "command": "npx -y @modelcontextprotocol/server-filesystem /tmp/orbench-anthropic-claude-sonnet-5", "faults": 1}}
+{"t": 0.472, "kind": "tools_list", "tool": null, "detail": {"count": 14, "chars": 12272, "tools": ["read_file", "read_text_file", "read_media_file", "read_multiple_files", "write_file", "edit_file", "create_directory", "list_directory", "list_directory_with_sizes", "directory_tree", "move_file", "search_files", "get_file_info", "list_allowed_directories"]}}
+{"t": 3.113, "kind": "tool_call", "tool": "write_file", "detail": {"id": 3, "args_chars": 95, "args_hash": "119469ec"}}
+{"t": 3.113, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 3, "mode": "short_circuit"}}
+{"t": 5.764, "kind": "tool_call", "tool": "list_directory", "detail": {"id": 4, "args_chars": 50, "args_hash": "d991cd16"}}
+{"t": 5.772, "kind": "tool_result", "tool": "list_directory", "detail": {"id": 4, "ok": false, "ms": 7, "chars": 231}}
+{"t": 8.22, "kind": "tool_call", "tool": "write_file", "detail": {"id": 5, "args_chars": 103, "args_hash": "3ddbe7ab"}}
+{"t": 8.22, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 5, "mode": "short_circuit"}}
+{"t": 11.499, "kind": "tool_call", "tool": "list_allowed_directories", "detail": {"id": 6, "args_chars": 2, "args_hash": "99914b93"}}
+{"t": 11.503, "kind": "tool_result", "tool": "list_allowed_directories", "detail": {"id": 6, "ok": true, "ms": 3, "chars": 245}}
+{"t": 11.504, "kind": "tool_call", "tool": "list_directory", "detail": {"id": 7, "args_chars": 24, "args_hash": "ea788c43"}}
+{"t": 11.505, "kind": "tool_result", "tool": "list_directory", "detail": {"id": 7, "ok": false, "ms": 2, "chars": 205}}
+{"t": 14.553, "kind": "tool_call", "tool": "get_file_info", "detail": {"id": 8, "args_chars": 58, "args_hash": "cbaffc13"}}
+{"t": 14.56, "kind": "tool_result", "tool": "get_file_info", "detail": {"id": 8, "ok": true, "ms": 7, "chars": 641}}
+{"t": 14.561, "kind": "tool_call", "tool": "list_directory", "detail": {"id": 9, "args_chars": 58, "args_hash": "cbaffc13"}}
+{"t": 14.564, "kind": "tool_result", "tool": "list_directory", "detail": {"id": 9, "ok": true, "ms": 2, "chars": 109}}
+{"t": 17.133, "kind": "tool_call", "tool": "write_file", "detail": {"id": 10, "args_chars": 103, "args_hash": "3ddbe7ab"}}
+{"t": 17.133, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 10, "mode": "short_circuit"}}
+{"t": 19.648, "kind": "tool_call", "tool": "list_directory", "detail": {"id": 11, "args_chars": 58, "args_hash": "cbaffc13"}}
+{"t": 19.653, "kind": "tool_result", "tool": "list_directory", "detail": {"id": 11, "ok": true, "ms": 4, "chars": 110}}
+{"t": 22.733, "kind": "tool_call", "tool": "write_file", "detail": {"id": 12, "args_chars": 103, "args_hash": "3ddbe7ab"}}
+{"t": 22.733, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 12, "mode": "short_circuit"}}
+{"t": 25.257, "kind": "tool_call", "tool": "list_directory", "detail": {"id": 13, "args_chars": 58, "args_hash": "cbaffc13"}}
+{"t": 25.258, "kind": "tool_result", "tool": "list_directory", "detail": {"id": 13, "ok": true, "ms": 1, "chars": 110}}
+{"t": 28.12, "kind": "tool_call", "tool": "edit_file", "detail": {"id": 14, "args_chars": 131, "args_hash": "e5ff504e"}}
+{"t": 28.123, "kind": "tool_result", "tool": "edit_file", "detail": {"id": 14, "ok": false, "ms": 3, "chars": 189}}
+{"t": 30.828, "kind": "tool_call", "tool": "list_directory_with_sizes", "detail": {"id": 15, "args_chars": 58, "args_hash": "cbaffc13"}}
+{"t": 30.832, "kind": "tool_result", "tool": "list_directory_with_sizes", "detail": {"id": 15, "ok": true, "ms": 4, "chars": 212}}
+{"t": 33.897, "kind": "tool_call", "tool": "write_file", "detail": {"id": 16, "args_chars": 103, "args_hash": "3ddbe7ab"}}
+{"t": 33.897, "kind": "fault", "tool": "write_file", "detail": {"type": "timeout", "id": 16, "mode": "short_circuit"}}
