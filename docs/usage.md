@@ -278,12 +278,21 @@ uvx mcp-chaos doctor .mcp.json            # or claude_desktop_config.json, Curso
 ```
 
 ```
-✔ filesystem: 14 tools · ~3214 tokens of definitions · ready in 774 ms
-✘ github: timed out after 20s waiting for initialize/tools list
+✔ filesystem: 14 tools · ~3214 tokens of definitions · ready in 546 ms
+✔ repo-fs: 14 tools · ~3214 tokens of definitions · ready in 536 ms
+✔ context7: 2 tools · ~1171 tokens of definitions · ready in 638 ms
+✘ github: launch failed: [Errno 2] No such file or directory: 'github-mcp-server-not-installed'
+- sentry: skipped — HTTP transport not checked yet (https://mcp.sentry.dev/mcp)
+⚠ tool name collision: create_directory (filesystem, repo-fs)
 ⚠ tool name collision: read_file (filesystem, repo-fs)
-3 server(s) · 27 tools · ~6400 tokens of tool definitions per session
+⚠ tool name collision: write_file (filesystem, repo-fs)
+… 11 more collision lines …
+5 server(s) · 30 tools · ~7599 tokens of tool definitions per session
 1 problem(s) found
 ```
+
+*Real output (truncated at the `…` only) from doctoring a five-server config —
+[full output and config](experiments/2026-07-03-config-doctor.md).*
 
 Per server: does it launch and respond, how many tools it advertises, the
 ~context-token cost of those definitions (chars/4, same heuristic as the
