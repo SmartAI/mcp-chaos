@@ -297,6 +297,84 @@
     <a href="https://github.com/SmartAI/mcp-chaos/blob/main/docs/experiments/2026-07-03-context-tax.md">experiment writeup →</a></small></p>
   </section>
 
+  <section class="event" style="--dot: var(--call)">
+    <p class="evline"><b>2026-07-03</b> · five capabilities · <b>real captured output, raw logs committed</b></p>
+    <h2>What you get — measured, not promised</h2>
+    <p>Every block below is byte-for-byte output from a real run made today; the raw
+    logs, configs and transcripts are committed under
+    <a href="https://github.com/SmartAI/mcp-chaos/tree/main/docs/experiments">docs/experiments/</a>.</p>
+
+    <h2 style="font-size:1.15rem; margin-top:2rem;">Config doctor — <code>mcp-chaos doctor .mcp.json</code></h2>
+    <p>A five-server config, checked in about a second, no agent involved:</p>
+<pre class="term">✔ filesystem: 14 tools · ~3214 tokens of definitions · ready in 546 ms
+✔ repo-fs: 14 tools · ~3214 tokens of definitions · ready in 536 ms
+✔ context7: 2 tools · ~1171 tokens of definitions · ready in 638 ms
+<span class="k">✘ github: launch failed: [Errno 2] No such file or directory: 'github-mcp-server-not-installed'</span>
+- sentry: skipped — HTTP transport not checked yet (https://mcp.sentry.dev/mcp)
+<span class="k">⚠ tool name collision: write_file (filesystem, repo-fs)</span>
+<span class="c">… 13 more collision lines …</span>
+5 server(s) · 30 tools · ~7599 tokens of tool definitions per session
+1 problem(s) found</pre>
+    <p>One broken server and 14 silent tool-name collisions caught <i>before</i> any agent
+    burns a session on them, plus the per-session context price of the whole config —
+    exit code 1, so it drops straight into CI.
+    <a href="https://github.com/SmartAI/mcp-chaos/blob/main/docs/experiments/2026-07-03-config-doctor.md">Artifacts →</a></p>
+
+    <h2 style="font-size:1.15rem; margin-top:2rem;">Record &amp; replay — hermetic tool mocks</h2>
+    <p>We recorded one real headless-Claude-Code session against the official filesystem
+    server with <code>--cassette</code>, then <b>deleted the sandbox directory</b> and re-ran
+    the same task against <code>mcp-chaos replay</code> — no server, no filesystem. The agent
+    completed it identically:</p>
+<pre class="term">Done. 
+
+**Results:**
+1. **Allowed directory:** `/private/tmp/chaos-replay`
+2. **File created:** `/private/tmp/chaos-replay/notes.txt`
+3. **File contents:** `cassette demo`
+<span class="c">$ ls /tmp/chaos-replay</span>
+<span class="k">"/tmp/chaos-replay": No such file or directory (os error 2)</span></pre>
+    <p>Record once against the real backend, replay in CI forever: deterministic, offline,
+    $0 in tool-side cost — swapped in with the same one-line config change.
+    <a href="https://github.com/SmartAI/mcp-chaos/blob/main/docs/experiments/2026-07-03-record-replay.md">Artifacts →</a></p>
+
+    <h2 style="font-size:1.15rem; margin-top:2rem;">Hosted servers — same faults over Streamable HTTP</h2>
+    <p>Point <code>server.url</code> at a production MCP service you don't run (here:
+    Context7's hosted endpoint) and inject the same faults:</p>
+<pre class="term">server: {"name": "Context7", "version": "3.2.2", "websiteUrl": "https://context7.com", "description": "Context7 provides up-to-d ...
+tools: ['resolve-library-id', 'query-docs']
+resolve-library-id (live, un-faulted): Available Libraries: ...
+<span class="k">query-docs (fault injected): {"code": -32603, "message": "Internal error: service unavailable"}</span></pre>
+    <p>The un-faulted call hit the live backend; the faulted one never left the proxy. You
+    can now rehearse the outage of a hosted dependency you could never make fail on demand.
+    <a href="https://github.com/SmartAI/mcp-chaos/blob/main/docs/experiments/2026-07-03-http-transport.md">Artifacts →</a></p>
+
+    <h2 style="font-size:1.15rem; margin-top:2rem;">Duplicate-write detection — <code>--fail-on duplicate-write</code></h2>
+    <p>A <code>slow</code> fault pushed <code>write_file</code> past headless Claude Code's
+    5&nbsp;s tool timeout. The agent re-sent the identical write three times and reported
+    <i>"the operation to create status.txt could not be completed"</i> — while the file sat
+    on disk, written. The gate:</p>
+<pre class="term">mcp-chaos: wrote /tmp/chaos-dup-report.html
+mcp-chaos: 4 tool calls · 3 faults injected
+<span class="k">mcp-chaos: FAIL write_file (args eab66c28): replayed_after_fault, sent 3x, executed ok 0x</span></pre>
+    <p>"Timeout" does not mean "didn't happen" — this is the retry pattern that
+    double-charges a card, caught as a CI exit code from pure protocol traffic.
+    <a href="https://github.com/SmartAI/mcp-chaos/blob/main/docs/experiments/2026-07-03-duplicate-write.md">Artifacts →</a></p>
+
+    <h2 style="font-size:1.15rem; margin-top:2rem;">Transcript correlation — <code>mcp-chaos correlate</code></h2>
+    <p>We re-ran the dead-<code>write_file</code> scenario until a model lied.
+    qwen3-235b, run 14, final answer: <i>"The file was successfully created in the allowed
+    directory. The task SUCCEEDED."</i> — over an empty sandbox:</p>
+<pre class="term">tool write_file: fault(s) timeout — never succeeded
+final answer: claims success · no failure language
+<span class="k">verdict: claimed_success</span></pre>
+    <p>The run log alone proves the tool never worked; the transcript alone reads like a
+    success story. The join catches the lie — deterministically, with two documented
+    regexes — and <code>--fail-on claimed-success</code> exits 1. The lie is probabilistic
+    (0 in the first 10 runs, then 1 in 4), which is exactly why it's a CI gate and not a
+    manual test.
+    <a href="https://github.com/SmartAI/mcp-chaos/blob/main/docs/experiments/2026-07-03-correlate.md">Artifacts →</a></p>
+  </section>
+
   <section class="event" style="--dot: var(--result)">
     <p class="evline"><b>t=now</b> · tool_result · ok=true · <b>your turn</b></p>
     <h2>Quickstart</h2>
