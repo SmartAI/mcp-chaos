@@ -318,10 +318,12 @@ uvx mcp-chaos report run.jsonl -o report.html</pre>
     <p>Works with every MCP client — Claude Code, Cursor, Claude Desktop, or anything you
     built yourself — because it sits at the protocol layer, not inside your agent.
     <code>--fail-on runaway</code> turns the verdict into a CI exit code.</p>
-    <p class="scope">Honest scope: the proxy sees MCP tool traffic, not the agent's chat
-    output, and speaks stdio servers today (Streamable HTTP is planned). It observes
-    retries, loops and give-up behavior directly; "the agent claimed success while the
-    tool failed" needs transcript correlation — on the roadmap, not in the box.</p>
+    <p class="scope">Honest scope: the proxy sees MCP tool traffic — stdio servers and
+    hosted Streamable HTTP servers — not the agent's chat output. It observes retries,
+    loops and give-up behavior directly; "the agent claimed success while the tool
+    failed" is checked by <code>mcp-chaos correlate</code>, but only when you hand it
+    the transcript (a Claude Code session jsonl or the final answer as text) — the
+    judging rules are auditable regexes, not NLP.</p>
     <div class="btnrow">
       <a class="btn primary" href="https://github.com/SmartAI/mcp-chaos">Star the repo →</a>
       <a class="btn quiet" href="https://github.com/SmartAI/mcp-chaos/issues">Suggest a fault scenario</a>
@@ -333,7 +335,7 @@ uvx mcp-chaos report run.jsonl -o report.html</pre>
 
 <footer>
   <div class="in">
-    <span>mcp-chaos · MIT license</span>
+    <span>mcp-chaos · Apache-2.0 license</span>
     <a href="https://github.com/SmartAI/mcp-chaos">source</a>
     <a href="https://github.com/SmartAI/mcp-chaos/blob/main/docs/usage.md">docs</a>
     <a href="https://github.com/SmartAI/mcp-chaos/tree/main/docs/experiments">experiments</a>
