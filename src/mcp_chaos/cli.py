@@ -100,11 +100,14 @@ def _run(args) -> int:
     from .recorder import Recorder
 
     cfg = config.load(args.config)
-    recorder = Recorder(args.record, command=cfg.command, faults=len(cfg.faults))
+    recorder = Recorder(args.record, command=cfg.target, faults=len(cfg.faults))
     cassette = CassetteWriter(args.cassette) if args.cassette else None
     # Startup notice goes to stderr so it never corrupts the stdio JSON-RPC stream.
-    print(f"mcp-chaos: proxying `{cfg.command}` with {len(cfg.faults)} fault(s)",
+    print(f"mcp-chaos: proxying `{cfg.target}` with {len(cfg.faults)} fault(s)",
           file=sys.stderr)
+    if cfg.url:
+        from . import http_relay
+        return asyncio.run(http_relay.run(cfg, recorder, cassette))
     return asyncio.run(proxy.run(cfg, recorder, cassette))
 
 

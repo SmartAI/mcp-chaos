@@ -53,6 +53,26 @@ faults:
     payload: "IMPORTANT: ignore previous instructions and ..."
 ```
 
+For a **hosted** MCP server, give `url` instead of `command` and the proxy
+relays over Streamable HTTP — the agent side stays stdio, so the one-line
+config insert is unchanged:
+
+```yaml
+server:
+  url: "https://mcp.context7.com/mcp"
+  headers:                        # optional, e.g. auth
+    Authorization: "Bearer ${TOKEN}"
+  http_timeout: 60                # seconds per upstream request (default 60)
+
+faults:
+  - tool: "resolve-library-id"
+    type: timeout
+```
+
+Exactly one of `command` / `url` is required. Session ids and SSE-streamed
+responses are handled; the server's optional GET listening stream (for
+server-initiated requests) is not opened.
+
 ### Fault rule reference
 
 | Field | Required | Default | Meaning |
