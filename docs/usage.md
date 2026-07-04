@@ -350,6 +350,30 @@ client can replay a cassette recorded elsewhere. A tool call that never
 happened in the recording gets an honest JSON-RPC error — replay never invents
 data.
 
+What it looks like, from a real recorded session (headless Claude Code +
+the official filesystem server): the cassette holds every response the agent
+saw, e.g.
+
+```
+{"method": "tools/call", "tool": "write_file", "key": "e3c91c3e", "response": {"result": {"content": [{"type": "text", "text": "Successfully wrote to /private/tmp/chaos-replay/notes.txt"}], "structuredContent": {"content": "Successfully wrote to /private/tmp/chaos-replay/notes.txt"}}}}
+```
+
+We then **deleted the sandbox directory**, swapped the config to `replay`,
+and re-ran the same task. The agent completed it identically:
+
+```
+Done. 
+
+**Results:**
+1. **Allowed directory:** `/private/tmp/chaos-replay`
+2. **File created:** `/private/tmp/chaos-replay/notes.txt`
+3. **File contents:** `cassette demo`
+```
+
+— while `ls /tmp/chaos-replay` said `No such file or directory`. No server
+ran; every response came from the recording.
+*Real runs — [artifacts](experiments/2026-07-03-record-replay.md).*
+
 Two things this buys you:
 
 - **Zero-cost CI**: record one good session against the real server, commit the

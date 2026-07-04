@@ -1,0 +1,8 @@
+{"t": 0.0, "kind": "session_start", "tool": null, "detail": {"started_at": "2026-07-04T03:22:10+00:00", "command": "npx -y @modelcontextprotocol/server-filesystem /tmp/chaos-replay", "faults": 0}}
+{"t": 0.671, "kind": "tools_list", "tool": null, "detail": {"count": 14, "chars": 12272, "tools": ["read_file", "read_text_file", "read_media_file", "read_multiple_files", "write_file", "edit_file", "create_directory", "list_directory", "list_directory_with_sizes", "directory_tree", "move_file", "search_files", "get_file_info", "list_allowed_directories"]}}
+{"t": 4.285, "kind": "tool_call", "tool": "list_allowed_directories", "detail": {"id": 2, "args_chars": 2, "args_hash": "99914b93"}}
+{"t": 4.29, "kind": "tool_result", "tool": "list_allowed_directories", "detail": {"id": 2, "ok": true, "ms": 4, "chars": 203}}
+{"t": 7.881, "kind": "tool_call", "tool": "write_file", "detail": {"id": 3, "args_chars": 75, "args_hash": "e3c91c3e"}}
+{"t": 7.884, "kind": "tool_result", "tool": "write_file", "detail": {"id": 3, "ok": true, "ms": 3, "chars": 223}}
+{"t": 7.892, "kind": "tool_call", "tool": "read_file", "detail": {"id": 4, "args_chars": 47, "args_hash": "ec5971c5"}}
+{"t": 7.893, "kind": "tool_result", "tool": "read_file", "detail": {"id": 4, "ok": true, "ms": 2, "chars": 135}}
