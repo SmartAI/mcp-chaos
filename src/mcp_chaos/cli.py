@@ -29,6 +29,18 @@ def main(argv: list[str] | None = None) -> int:
                               "server — no real server, deterministic, zero cost")
     rpl.add_argument("cassette", help="path to a cassette recorded by `run --cassette`")
 
+    cor = sub.add_parser(
+        "correlate",
+        help="correlate a run log with the agent's transcript: did it claim "
+             "success while the tool failed?")
+    cor.add_argument("record", help="path to a run.jsonl produced by `run`")
+    cor.add_argument("transcript",
+                     help="the agent's transcript: a Claude Code session .jsonl, "
+                          "or a plain-text file holding the final answer")
+    cor.add_argument("--fail-on", choices=["claimed-success"],
+                     help="exit 1 if the agent claimed success over a tool "
+                          "that never worked")
+
     rep = sub.add_parser("report", help="render an HTML report from a run log")
     rep.add_argument("record", help="path to a run.jsonl produced by `run`")
     rep.add_argument("-o", "--out", default="report.html", help="HTML output path")
@@ -46,9 +58,21 @@ def main(argv: list[str] | None = None) -> int:
         return _run(args)
     if args.cmd == "replay":
         return _replay(args)
+    if args.cmd == "correlate":
+        return _correlate(args)
     if args.cmd == "report":
         return _report(args)
     return 1
+
+
+def _correlate(args) -> int:
+    from .correlate import correlate, summary
+
+    result = correlate(args.record, args.transcript)
+    print(summary(result))
+    if args.fail_on == "claimed-success" and result["verdict"] == "claimed_success":
+        return 1
+    return 0
 
 
 def _run(args) -> int:
