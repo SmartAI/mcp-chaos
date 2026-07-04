@@ -36,7 +36,7 @@ you built yourself.
 | Append-safe JSONL recording → single-file HTML report | Evidence you can read, share, and audit | ✅ shipped |
 | [Agent skill](skills/mcp-chaos/SKILL.md) | Your agent runs the whole test itself: "chaos-test my MCP setup" | ✅ shipped |
 | Record & replay | Hermetic tool mocks: deterministic, zero-cost CI runs and a dev-time cache | ✅ shipped |
-| Transcript correlation | Did the agent claim success while the tool failed? | 📋 planned |
+| Transcript correlation — `mcp-chaos correlate` | Did the agent claim success while the tool failed? | ✅ shipped |
 | Duplicate-write detection + `--fail-on duplicate-write` | Did a timeout retry double-execute a write? | ✅ shipped |
 | MCP config doctor | Do your servers launch, collide, or bloat your context — before the agent runs? | 📋 planned |
 | Streamable HTTP transport | Hosted MCP servers (GitHub, Sentry, ...) | 📋 planned |
@@ -115,8 +115,10 @@ how it works, fault types, profile mode, and report screenshots.
 ## Honest scope
 
 The proxy sees MCP tool traffic (stdio servers today), not the agent's chat
-output. Detecting "the agent claimed success while the tool failed" needs
-transcript correlation — on the roadmap, not in the box.
+output. `mcp-chaos correlate` closes that gap when you hand it the transcript
+(a Claude Code session `.jsonl` or the final answer as text) — the proxy alone
+still can't see what the agent told your user, and the success/failure language
+rules are deliberately simple and auditable, not NLP.
 
 Pre-alpha, moving fast. Star/watch to follow; issues and fault-scenario ideas
 welcome.

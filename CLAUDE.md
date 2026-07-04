@@ -18,8 +18,10 @@ to insert the proxy; works with every MCP client.
 
 The proxy sees MCP tool traffic, not the agent's natural-language output. So it can
 directly observe retries, loops, and give-up behavior. Detecting "the agent claimed
-success while the tool failed" needs transcript correlation (e.g. Claude Code
-session jsonl) — that's a roadmap item, not MVP.
+success while the tool failed" is shipped as `mcp-chaos correlate` (run log +
+transcript: Claude Code session jsonl or a plain-text final answer) — but it only
+works when the user hands us the transcript; the proxy alone never sees chat
+output. The judging rules are deterministic regexes, deliberately auditable.
 
 ## MVP scope
 
