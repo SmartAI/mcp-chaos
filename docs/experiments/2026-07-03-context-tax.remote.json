@@ -1,0 +1,138 @@
+{
+  "platform": "Linux-7.0.12-101.fc43.x86_64-x86_64-with-glibc2.42",
+  "node": "v22.22.2",
+  "results": [
+    {
+      "server": "filesystem",
+      "command": "npx -y @modelcontextprotocol/server-filesystem /tmp/mcpsurvey",
+      "tools": 14,
+      "listing_chars": 12272,
+      "listing_tokens": 3068,
+      "tool_names": [
+        "read_file",
+        "read_text_file",
+        "read_media_file",
+        "read_multiple_files",
+        "write_file",
+        "edit_file",
+        "create_directory",
+        "list_directory",
+        "list_directory_with_sizes",
+        "directory_tree",
+        "move_file",
+        "search_files",
+        "get_file_info",
+        "list_allowed_directories"
+      ],
+      "wall_s": 4.5
+    },
+    {
+      "server": "memory",
+      "command": "npx -y @modelcontextprotocol/server-memory",
+      "tools": 9,
+      "listing_chars": 9853,
+      "listing_tokens": 2463,
+      "tool_names": [
+        "create_entities",
+        "create_relations",
+        "add_observations",
+        "delete_entities",
+        "delete_observations",
+        "delete_relations",
+        "read_graph",
+        "search_nodes",
+        "open_nodes"
+      ],
+      "wall_s": 1.6
+    },
+    {
+      "server": "everything",
+      "command": "npx -y @modelcontextprotocol/server-everything",
+      "tools": 12,
+      "listing_chars": 5829,
+      "listing_tokens": 1457,
+      "tool_names": [
+        "echo",
+        "get-annotated-message",
+        "get-env",
+        "get-resource-links",
+        "get-resource-reference",
+        "get-structured-content",
+        "get-sum",
+        "get-tiny-image",
+        "gzip-file-as-resource",
+        "toggle-simulated-logging",
+        "toggle-subscriber-updates",
+        "trigger-long-running-operation"
+      ],
+      "wall_s": 1.9
+    },
+    {
+      "server": "sequential-thinking",
+      "command": "npx -y @modelcontextprotocol/server-sequential-thinking",
+      "tools": 1,
+      "listing_chars": 4548,
+      "listing_tokens": 1137,
+      "tool_names": [
+        "sequentialthinking"
+      ],
+      "wall_s": 1.9
+    },
+    {
+      "server": "playwright",
+      "command": "npx -y @playwright/mcp",
+      "tools": 23,
+      "listing_chars": 17463,
+      "listing_tokens": 4365,
+      "tool_names": [
+        "browser_close",
+        "browser_resize",
+        "browser_console_messages",
+        "browser_handle_dialog",
+        "browser_evaluate",
+        "browser_file_upload",
+        "browser_drop",
+        "browser_fill_form",
+        "browser_press_key",
+        "browser_type",
+        "browser_navigate",
+        "browser_navigate_back",
+        "browser_network_requests",
+        "browser_network_request",
+        "browser_run_code_unsafe",
+        "browser_take_screenshot",
+        "browser_snapshot",
+        "browser_click",
+        "browser_drag",
+        "browser_hover",
+        "browser_select_option",
+        "browser_tabs",
+        "browser_wait_for"
+      ],
+      "wall_s": 2.0
+    },
+    {
+      "server": "context7",
+      "command": "npx -y @upstash/context7-mcp",
+      "tools": 2,
+      "listing_chars": 4655,
+      "listing_tokens": 1163,
+      "tool_names": [
+        "resolve-library-id",
+        "query-docs"
+      ],
+      "wall_s": 2.1
+    },
+    {
+      "server": "fetch",
+      "command": "uvx mcp-server-fetch",
+      "tools": 1,
+      "listing_chars": 1149,
+      "listing_tokens": 287,
+      "tool_names": [
+        "fetch"
+      ],
+      "wall_s": 2.0
+    }
+  ]
+}
