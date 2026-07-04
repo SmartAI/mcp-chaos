@@ -25,9 +25,11 @@ def main(argv: list[str] | None = None) -> int:
     rep.add_argument("record", help="path to a run.jsonl produced by `run`")
     rep.add_argument("-o", "--out", default="report.html", help="HTML output path")
     rep.add_argument(
-        "--fail-on", choices=["runaway", "retried"],
-        help="exit 1 if any finding reaches this verdict "
-             "(retried is stricter: any retry, runaway included, fails)",
+        "--fail-on", choices=["runaway", "retried", "duplicate-write"], action="append",
+        help="exit 1 if any finding reaches this verdict; repeat the flag to "
+             "gate on several (retried is stricter than runaway: any retry "
+             "fails; duplicate-write: an identical write was re-sent after a "
+             "fault or double-executed)",
     )
 
     args = parser.parse_args(argv)
@@ -68,14 +70,24 @@ def _report(args) -> int:
     if args.fail_on:
         from .checks import analyze, summary_line
 
-        failing = {"runaway"} if args.fail_on == "runaway" else {"runaway", "retried"}
+        gates = set(args.fail_on)
+        failing = set()
+        if "retried" in gates:
+            failing = {"runaway", "retried"}  # stricter gate: any retry fails
+        elif "runaway" in gates:
+            failing = {"runaway"}
         result = analyze(events)
         tripped = [f for f in result["findings"] if f.verdict in failing]
-        if tripped:
+        dupes = result["duplicate_writes"] if "duplicate-write" in gates else []
+        if tripped or dupes:
             print(f"mcp-chaos: {summary_line(result)}", file=sys.stderr)
             for f in tripped:
                 print(f"mcp-chaos: FAIL {f.tool} ({f.fault_type}): "
                       f"{f.verdict}, {f.retries} retries after fault", file=sys.stderr)
+            for d in dupes:
+                print(f"mcp-chaos: FAIL {d.tool} (args {d.args_hash}): "
+                      f"{d.verdict}, sent {d.calls}x, executed ok {d.executed_ok}x",
+                      file=sys.stderr)
             return 1
     return 0
 

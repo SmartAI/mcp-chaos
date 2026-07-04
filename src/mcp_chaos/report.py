@@ -11,7 +11,8 @@ from .recorder import Event
 
 _COLORS = {"tool_call": "#3b82f6", "fault": "#ef4444", "response": "#f59e0b",
            "session_start": "#6b7280", "tools_list": "#8b5cf6", "tool_result": "#10b981"}
-_VERDICT_COLORS = {"runaway": "#ef4444", "retried": "#f59e0b", "stopped": "#6b7280"}
+_VERDICT_COLORS = {"runaway": "#ef4444", "retried": "#f59e0b", "stopped": "#6b7280",
+                   "double_executed": "#ef4444", "replayed_after_fault": "#f59e0b"}
 
 
 def render(events: list[Event], title: str = "mcp-chaos run") -> str:
@@ -36,10 +37,20 @@ def render(events: list[Event], title: str = "mcp-chaos run") -> str:
             f'<td><span class="badge" style="background:{vc}">{f.verdict}</span></td></tr>'
         )
 
+    dupe_rows = []
+    for d in result["duplicate_writes"]:
+        vc = _VERDICT_COLORS.get(d.verdict, "#888")
+        dupe_rows.append(
+            f'<tr><td>{html.escape(d.tool)}</td><td class="d">{html.escape(d.args_hash)}</td>'
+            f'<td>{d.calls}</td><td>{d.executed_ok}</td>'
+            f'<td><span class="badge" style="background:{vc}">{d.verdict}</span></td></tr>'
+        )
+
     return _TEMPLATE.format(
         title=html.escape(title),
         summary=html.escape(summary_line(result)),
         findings="\n".join(finding_rows) or '<tr><td colspan="4">no faults injected</td></tr>',
+        dupes="\n".join(dupe_rows) or '<tr><td colspan="5">none detected</td></tr>',
         efficiency=_efficiency_section(events),
         rows="\n".join(rows),
         data=json.dumps([e.__dict__ for e in events]),
@@ -100,6 +111,15 @@ _TEMPLATE = """<!doctype html>
     <thead><tr><th>Tool</th><th>Fault</th><th>Retries after fault</th><th>Verdict</th></tr></thead>
     <tbody>
 {findings}
+    </tbody>
+  </table>
+
+  <h2>Duplicate writes</h2>
+  <table>
+    <thead><tr><th>Tool</th><th>Args hash</th><th>Times sent</th>
+    <th>Executed ok</th><th>Verdict</th></tr></thead>
+    <tbody>
+{dupes}
     </tbody>
   </table>
 

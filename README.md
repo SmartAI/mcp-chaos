@@ -37,7 +37,7 @@ you built yourself.
 | [Agent skill](skills/mcp-chaos/SKILL.md) | Your agent runs the whole test itself: "chaos-test my MCP setup" | ✅ shipped |
 | Record & replay | Hermetic tool mocks: deterministic, zero-cost CI runs and a dev-time cache | 📋 planned |
 | Transcript correlation | Did the agent claim success while the tool failed? | 📋 planned |
-| Duplicate-write detection | Did a timeout retry double-execute a write? | 📋 planned |
+| Duplicate-write detection + `--fail-on duplicate-write` | Did a timeout retry double-execute a write? | ✅ shipped |
 | MCP config doctor | Do your servers launch, collide, or bloat your context — before the agent runs? | 📋 planned |
 | Streamable HTTP transport | Hosted MCP servers (GitHub, Sentry, ...) | 📋 planned |
 

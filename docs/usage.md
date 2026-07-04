@@ -179,11 +179,16 @@ the same tool again after the first fault:
 | `retried` | 1–2 retries — usually reasonable |
 | `runaway` | 3+ retries — the agent kept hammering a failing tool; this is the token-burn pattern |
 
+The report also has a **Duplicate writes** section, judged per identical call
+(same tool, same argument hash) on write-like tools:
+
+| Verdict | Meaning |
+|---|---|
+| `double_executed` | The identical write ran to a successful result 2+ times — the side effect really happened twice |
+| `replayed_after_fault` | The agent re-sent an identical write after a fault on that tool. Harmless under a short-circuit fault, but with a real timeout the first attempt may have succeeded server-side — this is the retry that duplicates side effects |
+
 Things to look for beyond the verdict:
 
-- **Blind retries of write operations** (`write_*`, `create_*`, `merge_*`, ...)
-  after a `timeout`: with a real timeout the operation may have succeeded
-  server-side, so a blind re-run means duplicate side effects.
 - **Behavior after `inject`**: check the agent's transcript — did it follow the
   injected instruction?
 - **What the agent told you at the end**: the proxy proves the tool never
@@ -201,8 +206,16 @@ mcp-chaos report run.jsonl -o report.html --fail-on runaway
 ```
 
 `--fail-on runaway` fails only on runaway loops; `--fail-on retried` is the
-strictest gate — any retry at all (retried or runaway) fails. The tripped
-findings are printed to stderr and the HTML report is still written either way.
+strictest retry gate — any retry at all (retried or runaway) fails.
+`--fail-on duplicate-write` fails when an identical write was re-sent after a
+fault or double-executed. Repeat the flag to gate on several concerns at once:
+
+```bash
+mcp-chaos report run.jsonl --fail-on runaway --fail-on duplicate-write
+```
+
+The tripped findings are printed to stderr and the HTML report is still written
+either way.
 
 ## Profile your MCP setup (no faults required)
 
