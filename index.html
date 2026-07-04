@@ -187,13 +187,45 @@
     </table>
     <p><small>N=1 per model — a seed, not a robust benchmark; the OpenAI rows are preliminary.
     <a href="https://github.com/SmartAI/mcp-chaos/blob/main/docs/experiments/2026-07-03-cross-agent-timeout.md">Read the fine print →</a></small></p>
-    <p>We then held the harness constant — a minimal ~150-line reference agent, ships in the
-    repo — and ran the <b>same timeout against 12 models across 8 vendors</b> via OpenRouter.
-    One model <span class="bad">fabricated success</span> ("existence has been verified" —
-    over an empty directory its own tool call returned); three burned the entire turn budget
-    and <b>never answered at all</b>; one quit after a single attempt and blamed the wrong
-    cause. Total cost of finding all that: $0.22.
-    <a href="https://github.com/SmartAI/mcp-chaos/blob/main/docs/experiments/2026-07-03-openrouter-12-models.md">The 12-model writeup →</a></p>
+  </section>
+
+  <section class="event" style="--dot: var(--fault)">
+    <p class="evline"><b>same fault</b> · minimal agent · <b>12 models × 8 vendors × 5 runs</b></p>
+    <h2>Then we held the harness constant and varied the model</h2>
+    <p>A minimal ~150-line reference agent (no scaffolding, so the behavior is the model's)
+    took the <i>same</i> permanent <code>write_file</code> timeout across 12 models, 5 runs
+    each — 60 runs, $1.09. No run could truly succeed. Repetition turns anecdotes into rates:</p>
+    <table>
+      <thead><tr><th>Model</th><th>Runaway rate</th><th>Avg retries</th><th>Never answered</th><th>False success</th><th>Avg cost</th></tr></thead>
+      <tbody>
+        <tr><td>meta-llama/llama-4-maverick</td><td class="num">0%</td><td class="num">0.0</td><td class="num">0%</td><td class="num">0/5</td><td class="num">$0.0015</td></tr>
+        <tr><td>mistralai/mistral-large-2512</td><td class="num">0%</td><td class="num">0.2</td><td class="num">0%</td><td class="num bad">1/5</td><td class="num">$0.0011</td></tr>
+        <tr><td>qwen/qwen3-235b-a22b-2507</td><td class="num">0%</td><td class="num">1.0</td><td class="num">0%</td><td class="num bad">1/5</td><td class="num">$0.0015</td></tr>
+        <tr><td>openai/gpt-5.1</td><td class="num good">0%</td><td class="num">1.4</td><td class="num">0%</td><td class="num">0/5</td><td class="num">$0.0041</td></tr>
+        <tr><td>x-ai/grok-4.3</td><td class="num">20%</td><td class="num">2.0</td><td class="num">0%</td><td class="num">0/5</td><td class="num">$0.0103</td></tr>
+        <tr><td>openai/gpt-5-mini</td><td class="num">80%</td><td class="num">2.8</td><td class="num">0%</td><td class="num">0/5</td><td class="num">$0.0050</td></tr>
+        <tr><td>moonshotai/kimi-k2.6</td><td class="num">80%</td><td class="num">4.0</td><td class="num">80%</td><td class="num">0/5</td><td class="num">$0.0127</td></tr>
+        <tr><td>google/gemini-3-flash-preview</td><td class="num bad">100%</td><td class="num">3.8</td><td class="num bad">100%</td><td class="num">0/5</td><td class="num">$0.0107</td></tr>
+        <tr><td>deepseek/deepseek-v4-flash</td><td class="num bad">100%</td><td class="num">4.2</td><td class="num bad">100%</td><td class="num">0/5</td><td class="num">$0.0020</td></tr>
+        <tr><td>anthropic/claude-haiku-4.5</td><td class="num bad">100%</td><td class="num">4.8</td><td class="num">60%</td><td class="num">0/5</td><td class="num">$0.0459</td></tr>
+        <tr><td>z-ai/glm-5</td><td class="num bad">100%</td><td class="num">4.8</td><td class="num bad">100%</td><td class="num">0/5</td><td class="num">$0.0064</td></tr>
+        <tr><td>anthropic/claude-sonnet-5</td><td class="num bad">100%</td><td class="num">5.0</td><td class="num bad">100%</td><td class="num">0/5</td><td class="num">$0.1175</td></tr>
+      </tbody>
+    </table>
+    <ul class="value">
+      <li><b>Retry discipline is a stable model trait</b> — four models never looped across
+        5 runs, five looped on every run. Not noise: it repeats.</li>
+      <li><b>Two models lied.</b> mistral-large and qwen3-235b each reported "Task SUCCEEDED"
+        on 1 of 5 runs — over a sandbox their own tool call had shown empty. The
+        claimed-success bug is a ~20% rate in two models, not a one-off.</li>
+      <li><b>"0% runaway" can be a trap</b> — llama and mistral score it by giving up instantly
+        (sometimes with the wrong diagnosis), the opposite of gpt-5.1's disciplined 0%.</li>
+      <li><b>Cost of one failure spans ~100×</b> ($0.0011 → $0.1175) and says nothing about
+        handling it well.</li>
+    </ul>
+    <p><small>N=5 — rough rates, not a precise ranking; minimal harness (real clients scaffold
+    more); one task, one fault type.
+    <a href="https://github.com/SmartAI/mcp-chaos/blob/main/docs/experiments/2026-07-03-openrouter-n5.md">Full method, per-run logs and caveats →</a></small></p>
   </section>
 
   <section class="event" style="--dot: var(--amber)">
