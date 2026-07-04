@@ -247,6 +247,45 @@ Token figures use a chars/4 estimate — rough, but stable enough to rank where
 your context goes. This also works during a chaos run: the efficiency section
 appears in every report.
 
+## Record & replay (hermetic tool mocks)
+
+Add `--cassette` to any run and the proxy also captures every response exactly
+as the agent saw it — real, faulted, or mutated:
+
+```bash
+uvx mcp-chaos run -c faults.yaml --record run.jsonl --cassette cassette.jsonl
+```
+
+Then serve the cassette as a standalone MCP server — no real server launched,
+no network, no cost, fully deterministic:
+
+```json
+"command": "uvx",
+"args": ["mcp-chaos", "replay", "/abs/cassette.jsonl"]
+```
+
+Replay answers from the recording: identical calls play back in recorded order
+(FIFO), then the last response repeats if the agent calls more times than the
+recording did. `initialize` and `tools/list` match by method, so a different
+client can replay a cassette recorded elsewhere. A tool call that never
+happened in the recording gets an honest JSON-RPC error — replay never invents
+data.
+
+Two things this buys you:
+
+- **Zero-cost CI**: record one good session against the real server, commit the
+  cassette, and let CI runs hit the replay instead of a flaky or paid backend.
+- **Chaos on a recording**: to inject faults into a replayed session, point
+  `faults.yaml` at the replay itself — the two commands compose:
+
+```yaml
+server:
+  command: "uvx mcp-chaos replay /abs/cassette.jsonl"
+faults:
+  - tool: "write_file"
+    type: timeout
+```
+
 ## Turning it off and removing it
 
 The proxy lives entirely in your agent's MCP config — it never modifies the real

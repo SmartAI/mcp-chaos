@@ -15,12 +15,14 @@ import shlex
 import sys
 import time
 
+from .cassette import CassetteWriter, call_key
 from .config import Config
 from .faults import DELAY, MUTATE, SHORT_CIRCUIT, FaultEngine, mutate_response, short_circuit_response
 from .recorder import Recorder
 
 
-async def run(config: Config, recorder: Recorder) -> int:
+async def run(config: Config, recorder: Recorder,
+              cassette: CassetteWriter | None = None) -> int:
     engine = FaultEngine(config.faults)
     child = await asyncio.create_subprocess_exec(
         *shlex.split(config.command),
@@ -34,13 +36,16 @@ async def run(config: Config, recorder: Recorder) -> int:
     pending: dict = {}  # request id -> mutate Fault, awaiting the real response
     inflight: dict = {}  # request id -> (tool, monotonic send time), for tool_result capture
     listing: set = set()  # request ids of in-flight tools/list calls
+    reqmeta: dict = {}  # request id -> (method, tool, cassette key), when recording one
 
     writer = asyncio.create_task(_client_writer(out))
     to_child = asyncio.create_task(
-        _client_to_child(client_in, child, engine, pending, out, recorder, inflight, listing)
+        _client_to_child(client_in, child, engine, pending, out, recorder, inflight,
+                         listing, cassette, reqmeta)
     )
     from_child = asyncio.create_task(
-        _child_to_client(child, pending, out, recorder, inflight, listing)
+        _child_to_client(child, pending, out, recorder, inflight, listing,
+                         cassette, reqmeta)
     )
 
     await asyncio.wait([to_child, from_child], return_when=asyncio.FIRST_COMPLETED)
@@ -55,7 +60,8 @@ async def run(config: Config, recorder: Recorder) -> int:
     return child.returncode or 0
 
 
-async def _client_to_child(client_in, child, engine, pending, out, recorder, inflight, listing):
+async def _client_to_child(client_in, child, engine, pending, out, recorder, inflight,
+                           listing, cassette, reqmeta):
     while True:
         line = await client_in.readline()
         if not line:
@@ -64,6 +70,10 @@ async def _client_to_child(client_in, child, engine, pending, out, recorder, inf
         method = msg.get("method") if msg is not None else None
         if method == "tools/list" and msg.get("id") is not None:
             listing.add(msg["id"])
+        if cassette is not None and msg is not None and msg.get("id") is not None and method:
+            params = msg.get("params") or {}
+            tool_name = params.get("name") if method == "tools/call" else None
+            reqmeta[msg["id"]] = (method, tool_name, call_key(method, params))
         if msg is None or method != "tools/call":
             child.stdin.write(line)
             await child.stdin.drain()
@@ -84,7 +94,9 @@ async def _client_to_child(client_in, child, engine, pending, out, recorder, inf
         elif fault.type in SHORT_CIRCUIT:
             # Never reaches the real server: a `fault` event only, no tool_result.
             recorder.log("fault", tool=tool, type=fault.type, id=req_id, mode="short_circuit")
-            await out.put(_dump(short_circuit_response(fault, req_id)))
+            response = short_circuit_response(fault, req_id)
+            _cassette_log(cassette, reqmeta, req_id, response)
+            await out.put(_dump(response))
         elif fault.type in DELAY:
             recorder.log("fault", tool=tool, type=fault.type, id=req_id, delay_ms=fault.delay_ms)
             await asyncio.sleep(fault.delay_ms / 1000)
@@ -99,7 +111,8 @@ async def _client_to_child(client_in, child, engine, pending, out, recorder, inf
             await child.stdin.drain()
 
 
-async def _child_to_client(child, pending, out, recorder, inflight, listing):
+async def _child_to_client(child, pending, out, recorder, inflight, listing,
+                           cassette, reqmeta):
     while True:
         line = await child.stdout.readline()
         if not line:
@@ -123,9 +136,23 @@ async def _child_to_client(child, pending, out, recorder, inflight, listing):
         if msg is not None and rid in pending:
             fault = pending.pop(rid)
             recorder.log("response", type=fault.type, id=rid, mode="mutated")
-            await out.put(_dump(mutate_response(fault, msg)))
+            mutated = mutate_response(fault, msg)
+            _cassette_log(cassette, reqmeta, rid, mutated)
+            await out.put(_dump(mutated))
         else:
+            if msg is not None:
+                _cassette_log(cassette, reqmeta, rid, msg)
             await out.put(line)
+
+
+def _cassette_log(cassette, reqmeta, rid, response: dict) -> None:
+    """Capture the response as the agent saw it (real, faulted, or mutated)."""
+    if cassette is None or rid not in reqmeta:
+        return
+    method, tool, key = reqmeta.pop(rid)
+    body = {k: response[k] for k in ("result", "error") if k in response}
+    if body:
+        cassette.log(method, tool, key, body)
 
 
 async def _client_writer(out: asyncio.Queue):
