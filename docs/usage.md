@@ -220,6 +220,20 @@ The report also has a **Duplicate writes** section, judged per identical call
 | `double_executed` | The identical write ran to a successful result 2+ times — the side effect really happened twice |
 | `replayed_after_fault` | The agent re-sent an identical write after a fault on that tool. Harmless under a short-circuit fault, but with a real timeout the first attempt may have succeeded server-side — this is the retry that duplicates side effects |
 
+Here's a real catch: a `slow` fault delayed `write_file` past headless Claude
+Code's 5 s tool timeout. The agent re-sent the identical write three times,
+then reported *"the operation to create `status.txt` could not be completed"*
+— while `status.txt` sat on disk, written. The gate output:
+
+```
+mcp-chaos: wrote /tmp/chaos-dup-report.html
+mcp-chaos: 4 tool calls · 3 faults injected
+mcp-chaos: FAIL write_file (args eab66c28): replayed_after_fault, sent 3x, executed ok 0x
+```
+
+*Real run (exit code 1) — [artifacts](experiments/2026-07-03-duplicate-write.md),
+including why a cancelling client caps this at `replayed_after_fault`.*
+
 Things to look for beyond the verdict:
 
 - **Behavior after `inject`**: check the agent's transcript — did it follow the

@@ -1,0 +1,6 @@
+server:
+  command: "npx -y @modelcontextprotocol/server-filesystem /tmp/chaos-dup"
+faults:
+  - tool: "write_file"
+    type: slow
+    delay_ms: 8000
