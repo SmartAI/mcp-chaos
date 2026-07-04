@@ -61,11 +61,51 @@ EOF
 uvx mcp-chaos report run.jsonl -o report.html
 ```
 
+## Benchmark: one timeout, 12 models, 5 runs each
+
+We injected the **same** permanent `write_file` timeout into 12 models across 8
+vendors, each behind an identical [minimal reference agent](benchmarks/) (no
+scaffolding, so the behavior is the model's), 5 runs apiece — 60 runs, $1.09
+total. No run could truly succeed; the fault kills `write_file` for good.
+
+| Model | Runaway rate | Avg retries | Never answered | False success | Avg cost |
+|---|---|---|---|---|---|
+| meta-llama/llama-4-maverick | 0% | 0.0 | 0% | 0/5 | $0.0015 |
+| mistralai/mistral-large-2512 | 0% | 0.2 | 0% | **1/5** | $0.0011 |
+| qwen/qwen3-235b-a22b-2507 | 0% | 1.0 | 0% | **1/5** | $0.0015 |
+| openai/gpt-5.1 | **0%** | 1.4 | 0% | 0/5 | $0.0041 |
+| x-ai/grok-4.3 | 20% | 2.0 | 0% | 0/5 | $0.0103 |
+| openai/gpt-5-mini | 80% | 2.8 | 0% | 0/5 | $0.0050 |
+| moonshotai/kimi-k2.6 | 80% | 4.0 | 80% | 0/5 | $0.0127 |
+| google/gemini-3-flash-preview | 100% | 3.8 | 100% | 0/5 | $0.0107 |
+| deepseek/deepseek-v4-flash | 100% | 4.2 | 100% | 0/5 | $0.0020 |
+| anthropic/claude-haiku-4.5 | 100% | 4.8 | 60% | 0/5 | $0.0459 |
+| z-ai/glm-5 | 100% | 4.8 | 100% | 0/5 | $0.0064 |
+| anthropic/claude-sonnet-5 | 100% | 5.0 | 100% | 0/5 | $0.1175 |
+
+**What one dead tool reveals** — none of which a correctness eval would catch,
+because on a working tool all twelve pass:
+
+- **Retry discipline is a stable model trait that splits the field.** Four models
+  never looped across 5 runs; five looped on every run. gpt-5.1 held 0% runaway
+  every time; sonnet-5, gemini-3-flash, deepseek and glm-5 went runaway 5/5.
+- **Two models lied.** mistral-large and qwen3-235b each reported "Task
+  SUCCEEDED" on 1 of 5 runs — over a sandbox their own tool call had shown empty.
+  The claimed-success bug is a ~20% rate in two models, not a one-off.
+- **"0% runaway" can be a trap.** llama and mistral score 0% by *giving up
+  instantly* (0–0.2 retries, sometimes with the wrong diagnosis) — the opposite
+  of gpt-5.1's disciplined 0%. Read runaway rate together with the other columns.
+- **Cost of one failure spans ~100×** ($0.0011 → $0.1175) and says nothing about
+  handling it well: the priciest behavior and one of the cheapest are both bugs.
+
+**N=5 — rough rates, not a precise ranking.** Same fault, minimal harness (real
+clients scaffold more), one task type.
+[Full method, per-run logs and caveats →](docs/experiments/2026-07-03-openrouter-n5.md)
+
 ## Learn more
 
-**→ [Project page](https://smartai.github.io/mcp-chaos/)** — the cross-agent
-benchmark (one timeout, six models, a 50× cost spread), how it works, fault
-types, profile mode, and report screenshots.
+**→ [Project page](https://smartai.github.io/mcp-chaos/)** — the full benchmark,
+how it works, fault types, profile mode, and report screenshots.
 
 - [Usage guide](docs/usage.md) — copy-paste configs per client, the full fault
   reference, CI gating with `--fail-on`, how to read the report
