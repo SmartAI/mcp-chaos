@@ -29,6 +29,16 @@ def main(argv: list[str] | None = None) -> int:
                               "server — no real server, deterministic, zero cost")
     rpl.add_argument("cassette", help="path to a cassette recorded by `run --cassette`")
 
+    doc = sub.add_parser(
+        "doctor",
+        help="check an MCP client config: do the servers launch, collide, or "
+             "bloat your context — before any agent runs?")
+    doc.add_argument("config",
+                     help="client config with an mcpServers section "
+                          "(.mcp.json, claude_desktop_config.json, Cursor mcp.json)")
+    doc.add_argument("--timeout", type=float, default=20,
+                     help="seconds to wait per server (default 20)")
+
     cor = sub.add_parser(
         "correlate",
         help="correlate a run log with the agent's transcript: did it claim "
@@ -58,11 +68,21 @@ def main(argv: list[str] | None = None) -> int:
         return _run(args)
     if args.cmd == "replay":
         return _replay(args)
+    if args.cmd == "doctor":
+        return _doctor(args)
     if args.cmd == "correlate":
         return _correlate(args)
     if args.cmd == "report":
         return _report(args)
     return 1
+
+
+def _doctor(args) -> int:
+    from .doctor import diagnose, render_text
+
+    result = diagnose(args.config, timeout=args.timeout)
+    print(render_text(result))
+    return 1 if result["problems"] else 0
 
 
 def _correlate(args) -> int:

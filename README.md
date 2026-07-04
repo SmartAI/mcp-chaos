@@ -38,7 +38,7 @@ you built yourself.
 | Record & replay | Hermetic tool mocks: deterministic, zero-cost CI runs and a dev-time cache | ✅ shipped |
 | Transcript correlation — `mcp-chaos correlate` | Did the agent claim success while the tool failed? | ✅ shipped |
 | Duplicate-write detection + `--fail-on duplicate-write` | Did a timeout retry double-execute a write? | ✅ shipped |
-| MCP config doctor | Do your servers launch, collide, or bloat your context — before the agent runs? | 📋 planned |
+| MCP config doctor — `mcp-chaos doctor` | Do your servers launch, collide, or bloat your context — before the agent runs? | ✅ shipped |
 | Streamable HTTP transport | Hosted MCP servers (GitHub, Sentry, ...) | 📋 planned |
 
 ## Quickstart
